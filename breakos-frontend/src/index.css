@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ══════════════════════════════════════════
+   WEALTHSIMPLE DESIGN SYSTEM — TRUE PALETTE
+   Extracted from actual Wealthsimple web app
+   ══════════════════════════════════════════ */
+
+:root {
+  /* DARK MODE (default) — true black, monochromatic */
+  --bg: #0a0a09;
+  --bg-subtle: #111110;
+  --surface: #1c1c1a;
+  --surface-raised: #242422;
+  --surface-overlay: #2c2c29;
+  --border: #2e2e2b;
+  --border-subtle: #1e1e1c;
+
+  /* Primary accent — clean white, not neon */
+  --accent: #f5f5f3;
+  --accent-dim: #d4d4d0;
+  --accent-muted: rgba(245, 245, 243, 0.06);
+  --accent-text: #0a0a09;
+
+  /* Semantic colors */
+  --red: #ff453a;
+  --red-muted: rgba(255, 69, 58, 0.10);
+  --amber: #ff9f0a;
+  --amber-muted: rgba(255, 159, 10, 0.10);
+  --blue: #0a84ff;
+  --blue-muted: rgba(10, 132, 255, 0.10);
+  --green: #32d74b;
+  --green-muted: rgba(50, 215, 75, 0.10);
+
+  /* Text */
+  --text-primary: #f2f2ed;
+  --text-secondary: #8a8a82;
+  --text-muted: #505048;
+  --text-inverse: #0a0a09;
+
+  /* Navigation */
+  --nav-bg: #0a0a09;
+  --nav-border: #1e1e1c;
+
+  /* Sidebar */
+  --sidebar-bg: #0a0a09;
+  --sidebar-active: #1c1c1a;
+
+  /* Typography */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 28px;
+  --text-2xl: 40px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Animations */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] {
+  /* LIGHT MODE — warm off-white like Wealthsimple */
+  --bg: #f2efe8;
+  --bg-subtle: #ebe8e1;
+  --surface: #ffffff;
+  --surface-raised: #fafaf8;
+  --surface-overlay: #f5f2eb;
+  --border: #e8e5de;
+  --border-subtle: #f0ede6;
+
+  --accent: #1a1a18;
+  --accent-dim: #333330;
+  --accent-muted: rgba(26, 26, 24, 0.06);
+  --accent-text: #ffffff;
+
+  --red: #cc2200;
+  --red-muted: rgba(204, 34, 0, 0.08);
+  --amber: #b86800;
+  --amber-muted: rgba(184, 104, 0, 0.08);
+  --blue: #0055cc;
+  --blue-muted: rgba(0, 85, 204, 0.08);
+  --green: #1a7a30;
+  --green-muted: rgba(26, 122, 48, 0.08);
+
+  --text-primary: #1a1a18;
+  --text-secondary: #5a5a52;
+  --text-muted: #9a9a90;
+  --text-inverse: #ffffff;
+
+  --nav-bg: #ffffff;
+  --nav-border: #ece9e2;
+
+  --sidebar-bg: #ffffff;
+  --sidebar-active: #f5f2eb;
+}
+
+/* ══════════════════════════════════════════
+   BASE STYLES
+   ══════════════════════════════════════════ */
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  transition: background-color 0.3s var(--ease-smooth), color 0.3s var(--ease-smooth);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  zoom: 1.10;
+  /* Scales up all pixel-perfect sizes and fonts uniformly */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  transition: border-color 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+/* Tabular numbers for data */
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Button reset */
+button {
+  background-color: transparent;
+  background-image: none;
+}
+
+/* Animations */
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panelEnter {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-dot {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}

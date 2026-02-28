@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "breakos-streamlit",
+      "runtimeExecutable": "/Users/akshat227/Downloads/breakos/.venv/bin/python",
+      "runtimeArgs": ["-m", "streamlit", "run", "/Users/akshat227/Downloads/breakos/app.py", "--server.headless", "true"],
+      "port": 8501
+    }
+  ]
+}
