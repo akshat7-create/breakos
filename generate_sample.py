@@ -12,6 +12,7 @@ import pandas as pd
 import yfinance as yf
 from datetime import date, timedelta, datetime
 from pathlib import Path
+import concurrent.futures
 
 # ─────────────────────────────────────────
 # LIVE PRICE FETCHER
