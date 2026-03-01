@@ -294,5 +294,12 @@
     "timestamp": "2026-02-28T18:23:45.082650",
     "breakId": "0",
     "reason": "Reviewed via BreakOS"
+  },
+  {
+    "id": "9cdd4afe-de45-4bed-809a-234aad6e50b3",
+    "type": "system",
+    "action": "Sample break report loaded (8 breaks)",
+    "timestamp": "2026-02-28T19:50:36.038198",
+    "breakCount": 8
   }
 ]

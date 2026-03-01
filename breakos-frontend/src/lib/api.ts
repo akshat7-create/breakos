@@ -3,7 +3,7 @@
  * Connects React frontend to FastAPI backend at localhost:8000
  */
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = (import.meta as any).env.VITE_API_URL || '/api';
 
 export interface BreakRecord {
     id: string;
