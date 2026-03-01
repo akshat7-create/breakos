@@ -134,7 +134,7 @@ body {
 }
 
 #root {
-  height: 100dvh;
+  height: 100%;
   width: 100vw;
   overflow: hidden;
 }
@@ -142,8 +142,10 @@ body {
 @media (min-width: 1024px) {
   #root {
     zoom: 0.92;
-    height: calc(100vh / 0.92);
-    width: calc(100vw / 0.92);
+    height: 108.69vh;
+    /* 100 / 0.92 */
+    width: 108.69vw;
+    /* 100 / 0.92 */
   }
 }
 
