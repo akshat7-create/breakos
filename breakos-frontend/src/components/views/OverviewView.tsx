@@ -388,17 +388,19 @@ export function OverviewView() {
                                 {triageStatus !== 'complete' ? (
                                     <button
                                         onClick={async () => {
-                                            useStore.getState().setTriageStatus('loading');
-                                            try {
-                                                const result = await runTriage();
-                                                if (result.breaks) {
-                                                    useStore.getState().setBreaks(result.breaks);
-                                                    useStore.getState().setTriageStatus('complete');
-                                                }
-                                            } catch { useStore.getState().setTriageStatus('idle'); }
+                                            if (triageStatus !== 'loading' && total > 0) {
+                                                useStore.getState().setTriageStatus('loading');
+                                                try {
+                                                    const result = await runTriage();
+                                                    if (result.breaks) {
+                                                        useStore.getState().setBreaks(result.breaks);
+                                                        useStore.getState().setTriageStatus('complete');
+                                                    }
+                                                } catch { useStore.getState().setTriageStatus('idle'); }
+                                            }
                                         }}
                                         disabled={triageStatus === 'loading' || total === 0}
-                                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[13px] font-semibold bg-[var(--text-primary)] text-[var(--bg)] hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                                     >
                                         <PlayCircle size={15} />
                                         {triageStatus === 'loading' ? 'Running Triage…' : 'Run Quick Triage'}

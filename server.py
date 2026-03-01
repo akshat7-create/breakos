@@ -105,8 +105,23 @@ class DecisionRequest(BaseModel):
 # ─── Helpers ───────────────────────────────────────────
 
 def parse_xlsx_to_breaks(file_path: str) -> list:
-    """Parse an xlsx break report into a list of break dicts with IDs."""
-    df = pd.read_excel(file_path, sheet_name=0)
+    """Parse an xlsx or csv break report into a list of break dicts with IDs."""
+    try:
+        if file_path.lower().endswith('.csv'):
+            df = pd.read_csv(file_path)
+        else:
+            df = pd.read_excel(file_path, sheet_name=0)
+    except Exception as e:
+        raise ValueError("The provided file could not be read or is corrupted.")
+
+    if df.empty:
+        raise ValueError("The uploaded file contains no data.")
+
+    # Basic schema validation
+    required_cols = {'Trade Ref ID', 'Ticker'}
+    if not required_cols.issubset(df.columns):
+        raise ValueError("File is missing required columns. Expected at least 'Trade Ref ID' and 'Ticker'. This data cannot be processed.")
+
     breaks = []
     for i, row in df.iterrows():
         break_dict = row.to_dict()
@@ -223,18 +238,25 @@ def load_sample():
 
 @app.post("/api/upload")
 async def upload_file(file: UploadFile = File(...)):
-    """Upload an xlsx break report."""
-    if not file.filename.endswith(('.xlsx', '.xls', '.csv')):
-        raise HTTPException(status_code=400, detail="File must be .xlsx, .xls, or .csv")
+    """Upload an xlsx or csv break report."""
+    filename = file.filename.lower()
+    if not filename.endswith(('.xlsx', '.xls', '.csv')):
+        raise HTTPException(status_code=400, detail="File must be .xlsx, .xls, or .csv. Please upload a structured spreadsheet.")
 
     # Save temporarily
-    tmp_path = f"/tmp/breakos_upload_{uuid.uuid4().hex}.xlsx"
+    ext = filename.split('.')[-1]
+    tmp_path = f"/tmp/breakos_upload_{uuid.uuid4().hex}.{ext}"
     try:
         contents = await file.read()
         with open(tmp_path, "wb") as f:
             f.write(contents)
 
-        session["breaks"] = parse_xlsx_to_breaks(tmp_path)
+        try:
+            parsed_breaks = parse_xlsx_to_breaks(tmp_path)
+        except ValueError as ve:
+            raise HTTPException(status_code=400, detail=str(ve))
+
+        session["breaks"] = parsed_breaks
         session["triage_results"] = {}
         session["analysis_results"] = {}
         session["decisions"] = {}

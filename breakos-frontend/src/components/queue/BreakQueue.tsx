@@ -58,7 +58,7 @@ export function BreakQueue() {
                     onClick={handleTriage}
                     disabled={triageStatus === 'loading' || breaks.length === 0}
                     className={cn(
-                        "w-full bg-[var(--accent)] text-[var(--accent-text)] font-semibold text-[14px] py-3 rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-300 ease-out shadow-sm",
+                        "w-full bg-[var(--text-primary)] text-[var(--bg)] font-semibold text-[14px] py-3 rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-300 ease-out shadow-sm",
                         "hover:-translate-y-[1px] hover:shadow-md",
                         (triageStatus === 'loading' || breaks.length === 0) && "opacity-50 cursor-not-allowed transform-none"
                     )}

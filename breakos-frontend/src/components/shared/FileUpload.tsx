@@ -68,14 +68,14 @@ export function FileUpload() {
                 </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch w-full">
                 {/* Drop Zone */}
                 <label
                     onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                     onDragLeave={() => setDragOver(false)}
                     onDrop={handleDrop}
                     className={cn(
-                        "flex-1 border border-dashed rounded-2xl p-5 flex items-center justify-center cursor-pointer transition-all duration-300 ease-out",
+                        "flex-1 border border-dashed rounded-2xl p-5 flex items-center justify-center cursor-pointer transition-all duration-300 ease-out min-w-0 break-words",
                         dragOver
                             ? "border-[var(--accent-dim)] bg-[var(--accent-muted)]"
                             : "border-[var(--border)] hover:border-[var(--text-muted)] hover:bg-[var(--surface-overlay)]",
@@ -83,12 +83,12 @@ export function FileUpload() {
                     )}
                 >
                     <input type="file" accept=".xlsx,.xls,.csv" onChange={handleInputChange} className="hidden" />
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[var(--surface)] border border-[var(--border-subtle)] flex items-center justify-center shadow-sm">
+                    <div className="flex items-center gap-3 justify-center">
+                        <div className="w-10 h-10 rounded-full bg-[var(--surface)] border border-[var(--border-subtle)] flex items-center justify-center shadow-sm flex-shrink-0">
                             <Upload size={18} className="text-[var(--text-secondary)]" strokeWidth={2} />
                         </div>
-                        <div>
-                            <span className="text-[14px] font-medium text-[var(--text-primary)]">Drop file or browse</span>
+                        <div className="min-w-0">
+                            <span className="text-[14px] font-medium text-[var(--text-primary)] truncate text-center sm:text-left block">Drop file or browse</span>
                         </div>
                     </div>
                 </label>
@@ -98,7 +98,7 @@ export function FileUpload() {
                     onClick={handleSample}
                     disabled={status === 'processing'}
                     className={cn(
-                        "flex items-center gap-2.5 px-6 py-4 rounded-2xl border border-[var(--border-subtle)] transition-all duration-300 ease-out shadow-sm",
+                        "flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl border border-[var(--border-subtle)] transition-all duration-300 ease-out shadow-sm flex-shrink-0 whitespace-nowrap",
                         "text-[14px] font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-raised)] hover:border-[var(--border)]",
                         status === 'processing' && "opacity-50 cursor-not-allowed"
                     )}
