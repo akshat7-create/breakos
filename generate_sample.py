@@ -815,12 +815,18 @@ def generate_sample_breaks():
 
     print("Fetching live prices from Yahoo Finance...")
 
-    # Fetch all live prices up front
+    # Fetch all live prices concurrently
     prices = {}
-    for ticker in FALLBACK_PRICES:
-        price, source = fetch_live_price(ticker)
-        prices[ticker] = price
-        print(f"  {ticker}: ${price:.2f} ({source})")
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        future_to_ticker = {executor.submit(fetch_live_price, ticker): ticker for ticker in FALLBACK_PRICES}
+        for future in concurrent.futures.as_completed(future_to_ticker):
+            ticker = future_to_ticker[future]
+            try:
+                price, source = future.result()
+                prices[ticker] = price
+            except Exception:
+                prices[ticker] = FALLBACK_PRICES[ticker]
 
     # Guarantee at least 1 of each type
     guaranteed = []
