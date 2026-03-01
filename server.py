@@ -117,10 +117,23 @@ def parse_xlsx_to_breaks(file_path: str) -> list:
     if df.empty:
         raise ValueError("The uploaded file contains no data.")
 
-    # Basic schema validation
-    required_cols = {'Trade Ref ID', 'Ticker'}
-    if not required_cols.issubset(df.columns):
-        raise ValueError("File is missing required columns. Expected at least 'Trade Ref ID' and 'Ticker'. This data cannot be processed.")
+    # Strict schema validation: Ensure all required columns exist
+    # These match the exact fields expected by the frontend's Data Pipeline and Break Queue
+    exact_required_cols = {
+        'Trade Date', 'Settle Date', 'Currency', 'Security Name', 'Ticker', 'Security Type',
+        'Trade Ref ID', 'Internal Fund', 'Counterparty', 'Internal Quantity', 'Street Quantity',
+        'Internal MV', 'Street MV', 'Price Diff', 'Net Amount Diff', 'Direction'
+    }
+    
+    missing_cols = exact_required_cols - set(df.columns)
+    if missing_cols:
+        raise ValueError(f"Invalid or irrelevant file. Missing critical dataset columns: {', '.join(missing_cols)}")
+
+    # Data integrity: Ensure critical numeric/date fields aren't completely blank/malformed for all rows
+    if df['Trade Ref ID'].isnull().all():
+        raise ValueError("Invalid dataset: All 'Trade Ref ID' values are missing.")
+    if df['Ticker'].isnull().all():
+         raise ValueError("Invalid dataset: All 'Ticker' values are missing.")
 
     breaks = []
     for i, row in df.iterrows():
