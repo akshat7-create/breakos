@@ -120,9 +120,9 @@ def parse_xlsx_to_breaks(file_path: str) -> list:
     # Strict schema validation: Ensure all required columns exist
     # These match the exact fields expected by the frontend's Data Pipeline and Break Queue
     exact_required_cols = {
-        'Trade Date', 'Settle Date', 'Currency', 'Security Name', 'Ticker', 'Security Type',
-        'Trade Ref ID', 'Internal Fund', 'Counterparty', 'Internal Quantity', 'Street Quantity',
-        'Internal MV', 'Street MV', 'Price Diff', 'Net Amount Diff', 'Direction'
+        'Trade Date', 'Settlement Date', 'Currency', 'Security Name', 'Ticker', 'Instrument Type',
+        'Trade Ref ID', 'Counterparty', 'Internal Qty', 'Street Qty',
+        'MV Internal ($)', 'MV Street ($)', 'MV Diff ($)'
     }
     
     missing_cols = exact_required_cols - set(df.columns)
