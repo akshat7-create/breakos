@@ -26,7 +26,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 />
             )}
 
-            <main className="flex-1 flex flex-col h-full overflow-hidden w-full lg:ml-[220px]">
+            <main className="flex-1 flex flex-col h-full overflow-hidden w-full">
                 {/* Top Nav Bar */}
                 <header className="h-14 lg:h-16 flex-shrink-0 border-b border-[var(--nav-border)] bg-[var(--nav-bg)]/80 backdrop-blur-2xl px-4 lg:px-8 flex items-center justify-between z-10">
                     <div className="flex items-center gap-3 lg:gap-8">
