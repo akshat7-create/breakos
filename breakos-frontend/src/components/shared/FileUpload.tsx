@@ -98,7 +98,7 @@ export function FileUpload() {
                     onDragLeave={() => setDragOver(false)}
                     onDrop={handleDrop}
                     className={cn(
-                        "flex-1 border border-dashed rounded-2xl p-5 flex items-center justify-center cursor-pointer transition-all duration-300 ease-out min-w-0 break-words",
+                        "w-full sm:w-[400px] border border-dashed rounded-2xl p-5 flex items-center justify-center cursor-pointer transition-all duration-300 ease-out min-w-0 break-words",
                         dragOver
                             ? "border-[var(--accent-dim)] bg-[var(--accent-muted)]"
                             : "border-[var(--border)] hover:border-[var(--text-muted)] hover:bg-[var(--surface-overlay)]",
@@ -121,7 +121,7 @@ export function FileUpload() {
                     onClick={handleSample}
                     disabled={status === 'processing'}
                     className={cn(
-                        "flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl border border-[var(--border-subtle)] transition-all duration-300 ease-out shadow-sm flex-shrink-0 whitespace-nowrap",
+                        "w-full sm:w-[250px] flex items-center justify-center gap-2.5 px-6 py-4 rounded-2xl border border-[var(--border-subtle)] transition-all duration-300 ease-out shadow-sm flex-shrink-0 whitespace-nowrap",
                         "text-[14px] font-semibold text-[var(--text-primary)] hover:bg-[var(--surface-raised)] hover:border-[var(--border)]",
                         status === 'processing' && "opacity-50 cursor-not-allowed"
                     )}
