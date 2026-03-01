@@ -301,5 +301,19 @@
     "action": "Sample break report loaded (8 breaks)",
     "timestamp": "2026-02-28T19:50:36.038198",
     "breakCount": 8
+  },
+  {
+    "id": "d427914a-a5f8-4767-aaea-d96f9279e929",
+    "type": "system",
+    "action": "Sample break report loaded (7 breaks)",
+    "timestamp": "2026-02-28T22:08:15.462542",
+    "breakCount": 7
+  },
+  {
+    "id": "829bed47-5183-4525-be9f-96e7c3ec588b",
+    "type": "investigation",
+    "action": "AI investigation completed for ENB.TO",
+    "timestamp": "2026-02-28T22:09:37.099889",
+    "breakId": "0"
   }
 ]

@@ -8,7 +8,7 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-    const { theme, toggleTheme, apiStatus } = useStore();
+    const { theme, toggleTheme, apiStatus, activeView } = useStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
@@ -38,9 +38,15 @@ export function AppLayout({ children }: AppLayoutProps) {
                             <Menu size={20} />
                         </button>
 
-                        <h1 className="text-[17px] font-medium tracking-tight text-[var(--text-primary)]">
-                            Break<span className="font-semibold">OS</span>
-                        </h1>
+                        <div className="flex items-center gap-2.5 sm:gap-3">
+                            <h1 className="text-[17px] font-medium tracking-tight text-[var(--text-primary)]">
+                                Break<span className="font-semibold">OS</span>
+                            </h1>
+                            <div className="w-px h-4 bg-[var(--border)]" />
+                            <span className="text-[14px] font-medium text-[var(--text-secondary)] capitalize">
+                                {activeView === 'queue' ? 'Investigation' : activeView === 'audit' ? 'Audit Log' : activeView}
+                            </span>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-3 lg:gap-6">

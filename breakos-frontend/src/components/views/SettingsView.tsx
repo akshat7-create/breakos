@@ -42,9 +42,9 @@ export function SettingsView() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 {/* Left column: Autonomy + Thresholds */}
-                <div className="col-span-2 space-y-5">
+                <div className="col-span-1 lg:col-span-2 space-y-5">
                     {/* Autonomy Levels */}
                     <motion.div
                         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
