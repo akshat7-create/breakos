@@ -126,7 +126,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -134,10 +134,17 @@ body {
 }
 
 #root {
-  zoom: 0.92;
-  height: calc(100vh / 0.92);
-  width: calc(100vw / 0.92);
+  height: 100dvh;
+  width: 100vw;
   overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  #root {
+    zoom: 0.92;
+    height: calc(100vh / 0.92);
+    width: calc(100vw / 0.92);
+  }
 }
 
 * {
