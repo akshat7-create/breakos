@@ -23,6 +23,36 @@ export function InvestigationPage() {
         }
     }, [status]);
 
+    const prevBreakId = useRef(selectedBreakId);
+
+    // Handle browser back button to return to queue instead of exiting app
+    useEffect(() => {
+        const handlePopState = () => {
+            if (selectedBreakId) {
+                setSelectedBreakId(null);
+            }
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [selectedBreakId, setSelectedBreakId]);
+
+    // Push state when a break is selected so the back button is primed
+    useEffect(() => {
+        if (selectedBreakId && !prevBreakId.current) {
+            window.history.pushState({ modal: true }, '');
+        } else if (selectedBreakId && prevBreakId.current && selectedBreakId !== prevBreakId.current) {
+            window.history.replaceState({ modal: true }, '');
+        }
+        prevBreakId.current = selectedBreakId;
+    }, [selectedBreakId]);
+
+    const handleBackToQueue = () => {
+        setSelectedBreakId(null);
+        if (window.history.state?.modal) {
+            window.history.back();
+        }
+    };
+
     return (
         <div className="flex flex-col lg:flex-row h-full overflow-hidden relative">
             {/* Left: Break queue for selection */}
@@ -35,18 +65,20 @@ export function InvestigationPage() {
 
             {/* Right: Detail + Investigation */}
             <div className={cn(
-                "h-full overflow-y-auto p-4 lg:p-4 pb-6 space-y-3 flex-1 transition-all duration-300",
+                "h-full overflow-y-auto p-4 lg:p-4 pb-6 space-y-3 flex-1 transition-all duration-300 relative",
                 !selectedBreakId ? "hidden lg:block" : "block w-full"
             )}>
                 {/* Mobile Back Button */}
                 {selectedBreakId && (
-                    <button
-                        onClick={() => setSelectedBreakId(null)}
-                        className="lg:hidden flex items-center gap-1.5 text-[13px] font-medium text-[var(--text-secondary)] mb-2 hover:text-[var(--text-primary)] transition-colors"
-                    >
-                        <ChevronLeft size={16} />
-                        Back to Queue
-                    </button>
+                    <div className="sticky top-0 z-20 bg-[var(--bg)]/90 backdrop-blur-md pb-2 pt-1 mb-2 lg:hidden border-b border-[var(--border-subtle)] -mx-4 px-4 -mt-4">
+                        <button
+                            onClick={handleBackToQueue}
+                            className="flex items-center gap-1.5 text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors py-1"
+                        >
+                            <ChevronLeft size={16} />
+                            Back to Queue
+                        </button>
+                    </div>
                 )}
 
                 <DetailPanel />

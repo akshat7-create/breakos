@@ -69,14 +69,14 @@ export function BreakQueue() {
             </div>
 
             {/* Severity Filter */}
-            <div className="px-5 py-2.5 flex-shrink-0">
-                <div className="flex flex-wrap gap-2">
+            <div className="px-5 py-2.5 flex-shrink-0 overflow-hidden">
+                <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
                     {severityFilters.map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveSeverity(tab)}
                             className={cn(
-                                "px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 border",
+                                "px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 border whitespace-nowrap flex-shrink-0",
                                 activeSeverity === tab
                                     ? "bg-[var(--accent)] text-[var(--accent-text)] border-transparent shadow-sm"
                                     : "text-[var(--text-secondary)] border-[var(--border-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)]"
@@ -91,15 +91,15 @@ export function BreakQueue() {
             {/* Instrument Type Filter */}
             {
                 showInstrumentFilter && (
-                    <div className="px-5 py-3 flex-shrink-0 border-t border-[var(--border-subtle)] mt-1">
+                    <div className="px-5 py-3 flex-shrink-0 border-t border-[var(--border-subtle)] mt-1 overflow-hidden">
                         <span className="text-[11px] uppercase text-[var(--text-muted)] font-semibold tracking-widest mb-2.5 block">Security Type</span>
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
                             {instrumentFilters.map(tab => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveInstrument(tab)}
                                     className={cn(
-                                        "px-3 py-1 rounded-full text-[12px] font-medium transition-all duration-300 border",
+                                        "px-3 py-1 rounded-full text-[12px] font-medium transition-all duration-300 border whitespace-nowrap flex-shrink-0",
                                         activeInstrument === tab
                                             ? "bg-[var(--text-primary)] text-[var(--surface)] border-transparent shadow-sm"
                                             : "text-[var(--text-secondary)] border-[var(--border-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)]"

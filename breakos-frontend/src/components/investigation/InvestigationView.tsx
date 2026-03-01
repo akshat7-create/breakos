@@ -122,32 +122,32 @@ export function InvestigationView({ breakId }: { breakId: string }) {
             >
                 {/* Header Bar */}
                 <div className="px-6 py-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
-                    <div className="flex items-center gap-3.5">
-                        <div className="w-10 h-10 rounded-xl bg-[var(--surface-overlay)] flex items-center justify-center border border-[var(--border-subtle)] shadow-sm">
+                    <div className="flex items-center gap-3.5 min-w-0 pr-2">
+                        <div className="w-10 h-10 rounded-xl bg-[var(--surface-overlay)] flex items-center justify-center border border-[var(--border-subtle)] shadow-sm flex-shrink-0">
                             <Brain size={18} className="text-[var(--text-primary)]" />
                         </div>
-                        <div>
-                            <h3 className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight">Investigation Reasoning</h3>
-                            <span className="text-[12px] text-[var(--text-muted)] mt-0.5 block tracking-wide">
+                        <div className="min-w-0">
+                            <h3 className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight truncate">Investigation Reasoning</h3>
+                            <span className="text-[12px] text-[var(--text-muted)] mt-0.5 block tracking-wide truncate">
                                 Case #{selectedBreak?.refId || breakId} · AI-native Reconciliation
                             </span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                         {status === 'complete' ? (
                             <>
                                 <button
                                     onClick={handleRerun}
-                                    className="text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--surface-overlay)] hover:bg-[var(--border-subtle)] px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors border border-[var(--border-subtle)] cursor-pointer"
+                                    className="text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--surface-overlay)] hover:bg-[var(--border-subtle)] px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors border border-[var(--border-subtle)] cursor-pointer whitespace-nowrap flex-shrink-0"
                                 >
                                     <RefreshCw size={11} />
                                     Re-run
                                 </button>
-                                <span className="text-[12px] font-semibold text-[var(--green)] bg-[var(--green-muted)] px-3 py-1.5 rounded-full">Complete</span>
+                                <span className="text-[12px] font-semibold text-[var(--green)] bg-[var(--green-muted)] px-3 py-1.5 rounded-full flex-shrink-0">Complete</span>
                             </>
                         ) : (
-                            <span className="text-[12px] font-semibold text-[var(--amber)] bg-[var(--amber-muted)] px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                                <Loader2 size={12} className="animate-spin" /> Analyzing...
+                            <span className="text-[12px] font-semibold text-[var(--amber)] bg-[var(--amber-muted)] px-3 py-1.5 rounded-full flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
+                                <Loader2 size={12} className="animate-spin flex-shrink-0" /> Analyzing...
                             </span>
                         )}
                     </div>
