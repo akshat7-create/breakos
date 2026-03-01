@@ -1,0 +1,298 @@
+[
+  {
+    "id": "cb198278-37ac-4cf4-8181-54bc8d242bdb",
+    "type": "system",
+    "action": "Sample break report loaded (9 breaks)",
+    "timestamp": "2026-02-28T02:33:38.216430",
+    "breakCount": 9
+  },
+  {
+    "id": "f98c972a-5bdd-4cdb-a200-7f81722fcfeb",
+    "type": "triage",
+    "action": "Quick triage completed for 9 breaks",
+    "timestamp": "2026-02-28T02:33:55.037934"
+  },
+  {
+    "id": "c2134b5f-0bad-443b-9a97-81f9cb318e7d",
+    "type": "investigation",
+    "action": "AI investigation completed for BMO.TO",
+    "timestamp": "2026-02-28T02:34:32.724198",
+    "breakId": "0"
+  },
+  {
+    "id": "02c99315-19c5-4904-bf41-9ecb9907fe7d",
+    "type": "escalate",
+    "action": "Akshat Aneja approved escalation for break 0",
+    "timestamp": "2026-02-28T02:36:48.179013",
+    "breakId": "0",
+    "reason": "Reviewed via BreakOS"
+  },
+  {
+    "id": "c2754a8c-252a-4124-9846-8298c667e21d",
+    "type": "investigation",
+    "action": "AI investigation completed for TSLA",
+    "timestamp": "2026-02-28T02:37:11.217616",
+    "breakId": "1"
+  },
+  {
+    "id": "eed67a4c-edf7-4875-b327-c6c6cb76926d",
+    "type": "override",
+    "action": "Akshat Aneja overrode AI recommendation for break 1",
+    "timestamp": "2026-02-28T02:37:41.144938",
+    "breakId": "1",
+    "reason": "Since issue is only related to STALE pricing - it will be automatically resolved"
+  },
+  {
+    "id": "18953f10-a53e-4126-bf8c-7c2fb113652b",
+    "type": "investigation",
+    "action": "AI investigation completed for CAN 3.5 06/26",
+    "timestamp": "2026-02-28T02:38:24.406650",
+    "breakId": "3"
+  },
+  {
+    "id": "a8835584-79b6-4707-bb88-3f1bd693b858",
+    "type": "investigation",
+    "action": "AI investigation completed for EUR/USD 3M",
+    "timestamp": "2026-02-28T02:39:20.780713",
+    "breakId": "4"
+  },
+  {
+    "id": "49dcbd97-92b6-4a18-96c0-176e1eeedf95",
+    "type": "system",
+    "action": "Sample break report loaded (7 breaks)",
+    "timestamp": "2026-02-28T02:47:43.881731",
+    "breakCount": 7
+  },
+  {
+    "id": "cee1f988-3bb9-4fb5-b789-0856ec7a29fe",
+    "type": "investigation",
+    "action": "AI investigation completed for VFV.TO",
+    "timestamp": "2026-02-28T02:48:13.585476",
+    "breakId": "1"
+  },
+  {
+    "id": "3bc1665d-ece1-42a6-8a7b-a9c31fa7cded",
+    "type": "triage",
+    "action": "Quick triage completed for 7 breaks",
+    "timestamp": "2026-02-28T02:48:43.068615"
+  },
+  {
+    "id": "31886580-dde4-4a8e-a4d0-42092cef8c21",
+    "type": "investigation",
+    "action": "AI investigation completed for VFV.TO",
+    "timestamp": "2026-02-28T02:48:45.831008",
+    "breakId": "1"
+  },
+  {
+    "id": "39d0a0d9-0c6e-4eb4-8f58-589901ac600a",
+    "type": "investigation",
+    "action": "AI investigation completed for EUR/USD 3M",
+    "timestamp": "2026-02-28T02:49:03.858290",
+    "breakId": "0"
+  },
+  {
+    "id": "fe8a560d-8065-4c56-9ed8-74d60ab080f4",
+    "type": "escalate",
+    "action": "Akshat Aneja approved escalation for break 0",
+    "timestamp": "2026-02-28T02:50:44.034097",
+    "breakId": "0",
+    "reason": "Reviewed via BreakOS"
+  },
+  {
+    "id": "f4188a76-a5df-4cf4-9f12-749f5e3a2b2b",
+    "type": "system",
+    "action": "Sample break report loaded (7 breaks)",
+    "timestamp": "2026-02-28T02:57:44.137039",
+    "breakCount": 7
+  },
+  {
+    "id": "1b561e91-f094-4db3-ab04-d1258911897f",
+    "type": "investigation",
+    "action": "AI investigation completed for TSLA",
+    "timestamp": "2026-02-28T02:59:50.277482",
+    "breakId": "0"
+  },
+  {
+    "id": "5fc93cb3-a062-4cfd-8dd5-47391dadb7d1",
+    "type": "system",
+    "action": "Sample break report loaded (5 breaks)",
+    "timestamp": "2026-02-28T03:01:10.475084",
+    "breakCount": 5
+  },
+  {
+    "id": "18cbd3a0-9f06-4570-a6ef-c48ca4919db9",
+    "type": "investigation",
+    "action": "AI investigation completed for USD/CAD",
+    "timestamp": "2026-02-28T03:02:58.688168",
+    "breakId": "1"
+  },
+  {
+    "id": "b977d895-3670-46dc-a0d6-2e2d9d609bd9",
+    "type": "triage",
+    "action": "Quick triage completed for 5 breaks",
+    "timestamp": "2026-02-28T03:03:04.021803"
+  },
+  {
+    "id": "0dc453bd-3e1b-47ec-95db-061430f694f0",
+    "type": "investigation",
+    "action": "AI investigation completed for BMO.TO",
+    "timestamp": "2026-02-28T03:03:37.342996",
+    "breakId": "0"
+  },
+  {
+    "id": "5aa254d2-015b-4473-b3a7-1bdb782ad011",
+    "type": "system",
+    "action": "Sample break report loaded (5 breaks)",
+    "timestamp": "2026-02-28T16:04:30.291782",
+    "breakCount": 5
+  },
+  {
+    "id": "f92a302d-08f5-40e1-9cdc-a7e020e2e806",
+    "type": "triage",
+    "action": "Quick triage completed for 5 breaks",
+    "timestamp": "2026-02-28T16:05:09.966775"
+  },
+  {
+    "id": "c703ca38-aeb7-4898-9054-63ebd403049a",
+    "type": "investigation",
+    "action": "AI investigation completed for IRS-5Y-USD",
+    "timestamp": "2026-02-28T16:05:39.113794",
+    "breakId": "0"
+  },
+  {
+    "id": "7ef1b711-3053-450e-a5e7-350807bde7eb",
+    "type": "system",
+    "action": "Sample break report loaded (9 breaks)",
+    "timestamp": "2026-02-28T17:25:34.678322",
+    "breakCount": 9
+  },
+  {
+    "id": "c38a0b45-188f-46c6-9a5a-d5e59160c6ee",
+    "type": "triage",
+    "action": "Quick triage completed for 9 breaks",
+    "timestamp": "2026-02-28T17:25:52.566542"
+  },
+  {
+    "id": "ffffd72a-511c-4872-a27d-01a00b3855a9",
+    "type": "investigation",
+    "action": "AI investigation completed for BMO.TO",
+    "timestamp": "2026-02-28T17:26:46.386103",
+    "breakId": "6"
+  },
+  {
+    "id": "8b3402c7-52a7-4e0d-8cfa-11086e4f0f39",
+    "type": "system",
+    "action": "Sample break report loaded (6 breaks)",
+    "timestamp": "2026-02-28T17:31:37.565050",
+    "breakCount": 6
+  },
+  {
+    "id": "cc0842dc-c9ec-4014-ac8a-e898d69bc97e",
+    "type": "system",
+    "action": "Sample break report loaded (8 breaks)",
+    "timestamp": "2026-02-28T17:33:44.036693",
+    "breakCount": 8
+  },
+  {
+    "id": "81f1dbda-c736-4438-a386-b9dddb2b85e2",
+    "type": "system",
+    "action": "Sample break report loaded (5 breaks)",
+    "timestamp": "2026-02-28T17:43:45.823618",
+    "breakCount": 5
+  },
+  {
+    "id": "64e81e5a-6172-4be2-a0c3-4335c483d9cf",
+    "type": "system",
+    "action": "Sample break report loaded (6 breaks)",
+    "timestamp": "2026-02-28T17:44:00.565137",
+    "breakCount": 6
+  },
+  {
+    "id": "c7b5fd30-8afe-4d17-a769-932d150a0483",
+    "type": "triage",
+    "action": "Quick triage completed for 6 breaks",
+    "timestamp": "2026-02-28T17:44:13.401514"
+  },
+  {
+    "id": "7eb86dee-75ef-4b1c-8f01-6b61740a94ef",
+    "type": "triage",
+    "action": "Quick triage completed for 6 breaks",
+    "timestamp": "2026-02-28T17:44:27.301865"
+  },
+  {
+    "id": "0314cef9-41cf-43e1-b887-8b6a5c6b9287",
+    "type": "investigation",
+    "action": "AI investigation completed for 912810TW2",
+    "timestamp": "2026-02-28T17:45:20.150720",
+    "breakId": "4"
+  },
+  {
+    "id": "e8bdab14-5c20-45e1-b849-c90526ce23d3",
+    "type": "system",
+    "action": "Sample break report loaded (5 breaks)",
+    "timestamp": "2026-02-28T17:45:52.525616",
+    "breakCount": 5
+  },
+  {
+    "id": "fe67784b-7879-4e2e-8765-74cb137f2e5f",
+    "type": "system",
+    "action": "Sample break report loaded (9 breaks)",
+    "timestamp": "2026-02-28T17:51:47.051945",
+    "breakCount": 9
+  },
+  {
+    "id": "409942d0-b56d-4b98-8e68-582b888b1541",
+    "type": "triage",
+    "action": "Quick triage completed for 9 breaks",
+    "timestamp": "2026-02-28T17:52:04.717726"
+  },
+  {
+    "id": "d2a44800-e88b-47f1-81c2-608aa3cceddd",
+    "type": "investigation",
+    "action": "AI investigation completed for NFLX",
+    "timestamp": "2026-02-28T17:52:50.193942",
+    "breakId": "0"
+  },
+  {
+    "id": "ee7dfcbf-2bb6-455f-8df9-d550a3b8bd8f",
+    "type": "system",
+    "action": "Sample break report loaded (5 breaks)",
+    "timestamp": "2026-02-28T17:58:36.793429",
+    "breakCount": 5
+  },
+  {
+    "id": "9563194a-1d29-41a0-a127-4f453389dd6a",
+    "type": "system",
+    "action": "Sample break report loaded (5 breaks)",
+    "timestamp": "2026-02-28T17:58:52.983251",
+    "breakCount": 5
+  },
+  {
+    "id": "4a9cbc97-8215-481a-902f-50ffef960788",
+    "type": "system",
+    "action": "Sample break report loaded (7 breaks)",
+    "timestamp": "2026-02-28T18:21:51.251188",
+    "breakCount": 7
+  },
+  {
+    "id": "55f6c7cf-df61-45fa-89ab-5fcb9e3f2673",
+    "type": "triage",
+    "action": "Quick triage completed for 7 breaks",
+    "timestamp": "2026-02-28T18:22:06.227222"
+  },
+  {
+    "id": "2f90a724-cc31-4340-9375-70f01087b41c",
+    "type": "investigation",
+    "action": "AI investigation completed for VFV.TO",
+    "timestamp": "2026-02-28T18:22:30.854670",
+    "breakId": "0"
+  },
+  {
+    "id": "d6042946-8618-4adc-93d9-e728bb5fc641",
+    "type": "escalate",
+    "action": "Akshat Aneja approved escalation for break 0",
+    "timestamp": "2026-02-28T18:23:45.082650",
+    "breakId": "0",
+    "reason": "Reviewed via BreakOS"
+  }
+]

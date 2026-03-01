@@ -1,26 +1,25 @@
 import { motion } from 'framer-motion';
 import { useStore, LoadingStep } from '../../store';
-import { Check, Loader2, Brain, Database, Scale, FileText, ChevronRight } from 'lucide-react';
+import { Check, Loader2, Brain, Database, Scale, FileText, ChevronRight, CheckCircle, Sparkles, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useEffect, useRef } from 'react';
 import { investigateBreak, SSEEvent } from '../../lib/api';
 import { PatternIntelligenceCard } from '../PatternIntelligenceCard';
 
-export function InvestigationView({ breakId }: { breakId: string }) {
-    const {
-        investigationStatus, setInvestigationStatus,
-        analysisText, appendAnalysisText, clearAnalysisText,
-        loadingSteps, setLoadingSteps,
-        dataSources, setDataSources,
-        breaks,
-    } = useStore();
+const EMPTY_BULLETS: string[] = [];
+const EMPTY_STEPS: LoadingStep[] = [];
+const EMPTY_SOURCES: string[] = [];
 
-    const status = investigationStatus[breakId] || 'idle';
-    const text = analysisText[breakId] || '';
-    const steps = loadingSteps[breakId] || [];
-    const sources = dataSources[breakId] || [];
+export function InvestigationView({ breakId }: { breakId: string }) {
+    const selectedBreak = useStore((s) => s.breaks.find(b => b.id === breakId));
+    const text = useStore((s) => s.analysisText[breakId] || '');
+    const status = useStore((s) => s.investigationStatus[breakId] || 'idle');
+    const steps = useStore((s) => s.loadingSteps[breakId] ?? EMPTY_STEPS);
+    const sources = useStore((s) => s.dataSources[breakId] ?? EMPTY_SOURCES);
+    const summaryBullets = useStore((s) => s.investigationSummary[breakId] ?? EMPTY_BULLETS);
+    const { setInvestigationStatus, appendAnalysisText, clearAnalysisText, setLoadingSteps, setDataSources, setInvestigationSummary } = useStore();
+
     const hasStartedRef = useRef<Record<string, boolean>>({});
-    const selectedBreak = breaks.find(b => b.id === breakId);
 
     useEffect(() => {
         if (status === 'loading' && !hasStartedRef.current[breakId]) {
@@ -72,6 +71,17 @@ export function InvestigationView({ breakId }: { breakId: string }) {
                     setDataSources(breakId, event.sources || []);
                     break;
 
+                case 'summary':
+                    try {
+                        const bullets = JSON.parse(event.summary || '[]');
+                        if (Array.isArray(bullets)) {
+                            setInvestigationSummary(breakId, bullets);
+                        }
+                    } catch {
+                        console.warn('Failed to parse summary JSON');
+                    }
+                    break;
+
                 case 'complete':
                     setInvestigationStatus(breakId, 'complete');
                     break;
@@ -86,6 +96,18 @@ export function InvestigationView({ breakId }: { breakId: string }) {
         return cancel;
     };
 
+    const handleRerun = () => {
+        // Reset the guard so useEffect will re-trigger
+        hasStartedRef.current[breakId] = false;
+        // Clear previous analysis data
+        clearAnalysisText(breakId);
+        setLoadingSteps(breakId, []);
+        setDataSources(breakId, []);
+        setInvestigationSummary(breakId, []);
+        // Re-trigger investigation
+        setInvestigationStatus(breakId, 'loading');
+    };
+
     if (status === 'idle') return null;
 
     // Parse the analysis text into sections
@@ -96,27 +118,36 @@ export function InvestigationView({ breakId }: { breakId: string }) {
             {/* Investigation Header */}
             <motion.div
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-[var(--surface)] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12)]"
+                className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
             >
                 {/* Header Bar */}
-                <div className="px-5 py-4 border-b border-[var(--border-subtle)] flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[var(--surface-overlay)] flex items-center justify-center">
-                            <Brain size={16} className="text-[var(--text-primary)]" />
+                <div className="px-6 py-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
+                    <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-[var(--surface-overlay)] flex items-center justify-center border border-[var(--border-subtle)] shadow-sm">
+                            <Brain size={18} className="text-[var(--text-primary)]" />
                         </div>
                         <div>
-                            <h3 className="text-[15px] font-bold text-[var(--text-primary)] tracking-tight">Investigation Reasoning</h3>
-                            <span className="text-[11px] text-[var(--text-muted)]">
+                            <h3 className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight">Investigation Reasoning</h3>
+                            <span className="text-[12px] text-[var(--text-muted)] mt-0.5 block tracking-wide">
                                 Case #{selectedBreak?.refId || breakId} · AI-native Reconciliation
                             </span>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         {status === 'complete' ? (
-                            <span className="text-[11px] font-semibold text-[var(--green)] bg-[var(--green-muted)] px-3 py-1 rounded-full">Complete</span>
+                            <>
+                                <button
+                                    onClick={handleRerun}
+                                    className="text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--surface-overlay)] hover:bg-[var(--border-subtle)] px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors border border-[var(--border-subtle)] cursor-pointer"
+                                >
+                                    <RefreshCw size={11} />
+                                    Re-run
+                                </button>
+                                <span className="text-[12px] font-semibold text-[var(--green)] bg-[var(--green-muted)] px-3 py-1.5 rounded-full">Complete</span>
+                            </>
                         ) : (
-                            <span className="text-[11px] font-semibold text-[var(--amber)] bg-[var(--amber-muted)] px-3 py-1 rounded-full flex items-center gap-1.5">
-                                <Loader2 size={10} className="animate-spin" /> Analyzing
+                            <span className="text-[12px] font-semibold text-[var(--amber)] bg-[var(--amber-muted)] px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                                <Loader2 size={12} className="animate-spin" /> Analyzing...
                             </span>
                         )}
                     </div>
@@ -124,31 +155,31 @@ export function InvestigationView({ breakId }: { breakId: string }) {
 
                 {/* Loading Steps — Pipeline Style */}
                 {steps.length > 0 && (
-                    <div className="px-5 py-4 border-b border-[var(--border-subtle)]">
-                        <div className="flex items-center gap-2 mb-3">
-                            <Database size={13} className="text-[var(--text-muted)]" />
-                            <span className="text-[11px] uppercase font-bold tracking-[0.08em] text-[var(--text-muted)]">Data Pipeline</span>
+                    <div className="px-6 py-5 border-b border-[var(--border-subtle)]">
+                        <div className="flex items-center gap-2 mb-3.5">
+                            <Database size={14} className="text-[var(--text-muted)]" />
+                            <span className="text-[11px] uppercase font-bold tracking-[0.1em] text-[var(--text-muted)]">Data Pipeline</span>
                         </div>
-                        <div className="flex flex-nowrap items-center min-w-0 overflow-x-auto no-scrollbar gap-2 pb-1">
+                        <div className="flex flex-nowrap items-center min-w-0 overflow-x-auto no-scrollbar gap-2.5 pb-2">
                             {steps.map((step, i) => (
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: i * 0.05 }}
                                     className={cn(
-                                        "flex flex-shrink-0 items-center gap-1.5 px-2 py-1.5 rounded-lg border transition-all",
+                                        "flex flex-shrink-0 items-center gap-2 px-3 py-2 rounded-xl border transition-all duration-300 ease-out",
                                         step.status === 'done'
-                                            ? "bg-[var(--green-muted)] border-transparent"
-                                            : "bg-[var(--surface-overlay)] border-[var(--border)]"
+                                            ? "bg-[var(--green-muted)] border-[var(--green-muted)] shadow-sm"
+                                            : "bg-[var(--surface-overlay)] border-[var(--border-subtle)]"
                                     )}
                                 >
-                                    {step.status === 'loading' && <Loader2 size={11} className="text-[var(--text-secondary)] animate-spin" />}
-                                    {step.status === 'done' && <Check size={11} className="text-[var(--green)]" strokeWidth={3} />}
-                                    <span className={cn("text-[11px] whitespace-nowrap", step.status === 'done' ? "text-[var(--text-primary)] font-medium" : "text-[var(--text-secondary)]")}>
+                                    {step.status === 'loading' && <Loader2 size={12} className="text-[var(--text-secondary)] animate-spin" />}
+                                    {step.status === 'done' && <Check size={12} className="text-[var(--green)]" strokeWidth={3} />}
+                                    <span className={cn("text-[12px] whitespace-nowrap", step.status === 'done' ? "text-[var(--text-primary)] font-semibold" : "text-[var(--text-secondary)] font-medium")}>
                                         {step.label}
                                     </span>
                                     {step.result && (
-                                        <span className="text-[9px] text-[var(--text-muted)] ml-0.5 truncate max-w-[100px]">{step.result}</span>
+                                        <span className="text-[10px] text-[var(--text-muted)] ml-1 truncate max-w-[120px] font-medium tracking-wide">{step.result}</span>
                                     )}
                                 </motion.div>
                             ))}
@@ -171,11 +202,7 @@ export function InvestigationView({ breakId }: { breakId: string }) {
 
             {/* Analysis Sections — Reasoning Log Layout */}
             {text && (
-                <motion.div
-                    initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-[var(--surface)] rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12)] flex flex-col"
-                >
+                <div className="flex flex-col gap-4 mt-2">
                     {sections.filter(s => {
                         const t = (s.title || '').toLowerCase();
                         if (t.includes('recommendation') || t.includes('draft') || t.includes('email') || t.includes('action')) return false;
@@ -188,28 +215,30 @@ export function InvestigationView({ breakId }: { breakId: string }) {
                                 item.content.toLowerCase().startsWith('subject:'))
                         );
                         return !hasEmailContent;
-                    }).map((section, i, arr) => (
-                        <div key={i} className={cn(
-                            "flex flex-col",
-                            i < arr.length - 1 ? "border-b border-[var(--border-subtle)]" : ""
-                        )}>
+                    }).map((section, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + (i * 0.05) }}
+                            className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col"
+                        >
                             {section.title && (
-                                <div className="px-5 py-3 border-b border-[var(--border-subtle)] flex items-center gap-2 bg-[var(--surface-overlay)]">
+                                <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center gap-2.5 bg-[var(--bg)]">
                                     <SectionIcon type={section.type} />
-                                    <h4 className="text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-[0.06em]">{section.title}</h4>
+                                    <h4 className="text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-widest">{section.title}</h4>
                                 </div>
                             )}
-                            <div className="px-5 py-4">
+                            <div className="px-6 py-5">
                                 {section.items.map((item, j) => (
-                                    <div key={j} className="mb-3 last:mb-0">
+                                    <div key={j} className="mb-4 last:mb-0">
                                         {item.type === 'heading' && (
-                                            <h5 className="text-[13px] font-semibold text-[var(--text-primary)] mb-1.5 flex items-center gap-2">
-                                                <ChevronRight size={12} className="text-[var(--text-muted)]" />
+                                            <h5 className="text-[14px] font-semibold text-[var(--text-primary)] mb-2 flex items-center gap-2 tracking-tight">
+                                                <ChevronRight size={14} className="text-[var(--accent)]" />
                                                 {item.content}
                                             </h5>
                                         )}
                                         {item.type === 'text' && (
-                                            <p className="text-[13px] text-[var(--text-secondary)] leading-[1.75] pl-5">{item.content}</p>
+                                            <p className="text-[14px] text-[var(--text-secondary)] leading-[1.8] pl-6 font-medium">{item.content}</p>
                                         )}
                                         {item.type === 'metric' && (
                                             (item.label && (
@@ -220,10 +249,10 @@ export function InvestigationView({ breakId }: { breakId: string }) {
                                             )) ? (
                                                 <ConfidenceBar label={item.label || ''} content={item.content} index={j} />
                                             ) : (
-                                                <div className="flex items-center gap-3 pl-5 py-1">
-                                                    <span className="text-[12px] text-[var(--text-muted)]">{item.label}:</span>
+                                                <div className="flex items-center gap-3 pl-6 py-1.5">
+                                                    <span className="text-[13px] text-[var(--text-muted)] font-medium tracking-wide">{item.label}:</span>
                                                     <span className={cn(
-                                                        "text-[13px] font-bold font-tabular",
+                                                        "text-[14px] font-semibold font-mono tracking-tight",
                                                         item.highlight === 'red' ? 'text-[var(--red)]' :
                                                             item.highlight === 'green' ? 'text-[var(--green)]' :
                                                                 item.highlight === 'amber' ? 'text-[var(--amber)]' :
@@ -235,18 +264,76 @@ export function InvestigationView({ breakId }: { breakId: string }) {
                                     </div>
                                 ))}
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
+
+                    {/* AI Investigation Summary — genuine AI-generated bullets */}
+                    {summaryBullets.length > 0 && status === 'complete' && (() => {
+                        const recKeywords = ['route to', 'recommend', 'urgency', 'escalat', 'next step', 'action:'];
+                        const findings = summaryBullets.filter(b => !recKeywords.some(k => b.toLowerCase().includes(k)));
+                        const recs = summaryBullets.filter(b => recKeywords.some(k => b.toLowerCase().includes(k)));
+
+                        return (
+                            <motion.div
+                                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                            >
+                                <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center gap-2.5 bg-[var(--bg)]">
+                                    <Sparkles size={14} className="text-[var(--accent)]" />
+                                    <h4 className="text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-widest">AI Investigation Summary</h4>
+                                    <div className="ml-auto flex items-center gap-1.5">
+                                        <CheckCircle size={12} className="text-[var(--green)]" />
+                                        <span className="text-[11px] font-semibold text-[var(--green)]">Complete</span>
+                                    </div>
+                                </div>
+                                <div className="px-6 py-5 space-y-4">
+                                    {/* Findings */}
+                                    {findings.length > 0 && (
+                                        <ul className="space-y-3">
+                                            {findings.map((bullet, i) => (
+                                                <li key={i} className="flex items-start gap-3">
+                                                    <span className="text-[var(--accent)] mt-[5px] flex-shrink-0 text-[8px]">●</span>
+                                                    <span className="text-[13px] text-[var(--text-primary)] leading-[1.7] font-medium">{bullet}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+
+                                    {/* Recommendation sub-card */}
+                                    {recs.length > 0 && (
+                                        <div className="bg-[rgba(139,92,246,0.06)] border border-[rgba(139,92,246,0.18)] rounded-2xl p-4 mt-1">
+                                            <div className="flex items-center gap-2 mb-2.5">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-[#a78bfa]" />
+                                                <span className="text-[10px] font-bold text-[#a78bfa] uppercase tracking-wider">Recommendation</span>
+                                            </div>
+                                            <ul className="space-y-2">
+                                                {recs.map((r, i) => (
+                                                    <li key={i} className="flex items-start gap-2.5">
+                                                        <span className="text-[#a78bfa] mt-[2px] flex-shrink-0">→</span>
+                                                        <span className="text-[13px] text-[var(--text-primary)] leading-[1.7] font-medium">{r}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        );
+                    })()}
 
                     {/* Raw text fallback if no sections parsed */}
                     {sections.length === 0 && (
-                        <div className="p-5">
-                            <div className="text-[13px] leading-[1.8] whitespace-pre-wrap text-[var(--text-secondary)]">
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                            className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                        >
+                            <div className="text-[14px] leading-[1.8] whitespace-pre-wrap text-[var(--text-secondary)] font-medium">
                                 {text}
                             </div>
-                        </div>
+                        </motion.div>
                     )}
-                </motion.div>
+                </div>
             )}
 
             {/* Pattern Intelligence (Specific to this break) */}
@@ -269,20 +356,20 @@ function ConfidenceBar({ label, content, index }: { label: string, content: stri
     else if (lowerLabel.includes('secondary')) fillClass = "bg-[var(--amber)]";
 
     return (
-        <div className="mb-4 pl-5 pr-5">
-            <div className="flex justify-between items-end mb-1.5">
-                <span className="text-[13px] text-[var(--text-primary)]">
-                    <span className="font-semibold">{label}:</span> {text}
+        <div className="mb-5 pl-6 pr-6">
+            <div className="flex justify-between items-end mb-2">
+                <span className="text-[14px] text-[var(--text-primary)] tracking-tight">
+                    <span className="font-semibold text-[var(--text-secondary)] mr-1">{label}:</span> <span className="font-medium">{text}</span>
                 </span>
-                {pctMatch && <span className="text-[13px] font-semibold text-[var(--accent)] font-tabular">{pct}%</span>}
+                {pctMatch && <span className="text-[14px] font-bold text-[var(--accent)] font-mono">{pct}%</span>}
             </div>
             {pctMatch && (
-                <div className="h-[6px] rounded-full bg-[var(--surface-overlay)] overflow-hidden">
+                <div className="h-[8px] rounded-full bg-[var(--surface-overlay)] overflow-hidden shadow-inner">
                     <motion.div
                         initial={{ width: '0%' }}
                         animate={{ width: `${pct}%` }}
-                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: index * 0.12 }}
-                        className={cn("h-full rounded-full", fillClass)}
+                        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: index * 0.12 }}
+                        className={cn("h-full rounded-full shadow-[0_1px_2px_rgba(0,0,0,0.1)]", fillClass)}
                     />
                 </div>
             )}

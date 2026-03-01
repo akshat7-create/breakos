@@ -48,12 +48,13 @@ export interface BreakRecord {
 }
 
 export interface SSEEvent {
-    type: 'step' | 'step_done' | 'text' | 'sources' | 'complete' | 'error';
+    type: 'step' | 'step_done' | 'text' | 'sources' | 'summary' | 'complete' | 'error';
     step?: string;
     label?: string;
     result?: string;
     chunk?: string;
     sources?: string[];
+    summary?: string;
     message?: string;
 }
 

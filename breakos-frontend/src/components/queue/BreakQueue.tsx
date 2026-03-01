@@ -36,21 +36,21 @@ export function BreakQueue() {
     return (
         <div className="w-[340px] flex-shrink-0 border-r border-[var(--border-subtle)] bg-[var(--bg)] flex flex-col h-full">
             <div className="px-5 pt-5 pb-3 flex-shrink-0">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-5">
                     <div>
-                        <h2 className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight">Break Queue</h2>
-                        <span className="text-[12px] text-[var(--text-muted)]">{filteredBreaks.length} items</span>
+                        <h2 className="text-[17px] font-semibold text-[var(--text-primary)] tracking-tight">Break Queue</h2>
+                        <span className="text-[13px] text-[var(--text-muted)] mt-0.5 block">{filteredBreaks.length} items</span>
                     </div>
                     <button
                         onClick={() => setShowInstrumentFilter(!showInstrumentFilter)}
                         className={cn(
-                            "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                            "w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 ease-out border border-transparent",
                             showInstrumentFilter
-                                ? "bg-[var(--accent)] text-[var(--accent-text)]"
-                                : "text-[var(--text-muted)] hover:bg-[var(--surface-overlay)]"
+                                ? "bg-[var(--accent)] text-[var(--accent-text)] shadow-sm"
+                                : "text-[var(--text-secondary)] hover:bg-[var(--surface-overlay)] hover:border-[var(--border-subtle)]"
                         )}
                     >
-                        <SlidersHorizontal size={14} />
+                        <SlidersHorizontal size={15} />
                     </button>
                 </div>
 
@@ -58,28 +58,28 @@ export function BreakQueue() {
                     onClick={handleTriage}
                     disabled={triageStatus === 'loading' || breaks.length === 0}
                     className={cn(
-                        "w-full bg-[var(--accent)] text-[var(--accent-text)] font-semibold text-[13px] py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all duration-150",
-                        "hover:-translate-y-[0.5px] hover:shadow-md",
-                        (triageStatus === 'loading' || breaks.length === 0) && "opacity-50 cursor-not-allowed"
+                        "w-full bg-[var(--accent)] text-[var(--accent-text)] font-semibold text-[14px] py-3 rounded-2xl flex items-center justify-center gap-2.5 transition-all duration-300 ease-out shadow-sm",
+                        "hover:-translate-y-[1px] hover:shadow-md",
+                        (triageStatus === 'loading' || breaks.length === 0) && "opacity-50 cursor-not-allowed transform-none"
                     )}
                 >
-                    <RefreshCw size={14} className={cn(triageStatus === 'loading' && "animate-spin")} />
-                    {triageStatus === 'loading' ? 'Triaging...' : 'Run Quick Triage'}
+                    <RefreshCw size={15} className={cn(triageStatus === 'loading' && "animate-spin")} />
+                    {triageStatus === 'loading' ? 'Running Triage...' : 'Run Quick Triage'}
                 </button>
             </div>
 
             {/* Severity Filter */}
-            <div className="px-5 py-2 flex-shrink-0">
-                <div className="flex gap-1.5">
+            <div className="px-5 py-2.5 flex-shrink-0">
+                <div className="flex gap-2">
                     {severityFilters.map(tab => (
                         <button
                             key={tab}
                             onClick={() => setActiveSeverity(tab)}
                             className={cn(
-                                "px-3 py-1.5 rounded-full text-[12px] font-medium transition-all duration-150",
+                                "px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 border",
                                 activeSeverity === tab
-                                    ? "bg-[var(--accent)] text-[var(--accent-text)]"
-                                    : "text-[var(--text-secondary)] border border-[var(--border)] hover:text-[var(--text-primary)]"
+                                    ? "bg-[var(--accent)] text-[var(--accent-text)] border-transparent shadow-sm"
+                                    : "text-[var(--text-secondary)] border-[var(--border-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)]"
                             )}
                         >
                             {tab}
@@ -89,39 +89,42 @@ export function BreakQueue() {
             </div>
 
             {/* Instrument Type Filter */}
-            {showInstrumentFilter && (
-                <div className="px-5 py-2 flex-shrink-0 border-t border-[var(--border-subtle)]">
-                    <span className="text-[10px] uppercase text-[var(--text-muted)] font-bold tracking-wider mb-2 block">Security Type</span>
-                    <div className="flex gap-1.5 flex-wrap">
-                        {instrumentFilters.map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveInstrument(tab)}
-                                className={cn(
-                                    "px-2.5 py-1 rounded-full text-[11px] font-medium transition-all duration-150",
-                                    activeInstrument === tab
-                                        ? "bg-[var(--accent)] text-[var(--accent-text)]"
-                                        : "text-[var(--text-secondary)] border border-[var(--border)] hover:text-[var(--text-primary)]"
-                                )}
-                            >
-                                {tab}
-                            </button>
-                        ))}
+            {
+                showInstrumentFilter && (
+                    <div className="px-5 py-3 flex-shrink-0 border-t border-[var(--border-subtle)] mt-1">
+                        <span className="text-[11px] uppercase text-[var(--text-muted)] font-semibold tracking-widest mb-2.5 block">Security Type</span>
+                        <div className="flex gap-2 flex-wrap">
+                            {instrumentFilters.map(tab => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveInstrument(tab)}
+                                    className={cn(
+                                        "px-3 py-1 rounded-full text-[12px] font-medium transition-all duration-300 border",
+                                        activeInstrument === tab
+                                            ? "bg-[var(--text-primary)] text-[var(--surface)] border-transparent shadow-sm"
+                                            : "text-[var(--text-secondary)] border-[var(--border-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-overlay)]"
+                                    )}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            <div className="flex-1 overflow-y-auto px-4 pb-4 flex flex-col gap-2 pt-2">
+            <div className="flex-1 overflow-y-auto px-4 pb-4 flex flex-col gap-3 pt-3">
                 {filteredBreaks.map((b, i) => (
                     <BreakCard key={b.id} data={b} index={i} />
                 ))}
                 {filteredBreaks.length === 0 && (
-                    <div className="flex items-center justify-center h-32 text-[var(--text-muted)] text-[13px]">
-                        {breaks.length === 0 ? 'No breaks loaded' : 'No breaks match filters'}
+                    <div className="flex flex-col items-center justify-center h-40 text-[var(--text-muted)] gap-2">
+                        <span className="text-[14px] font-medium">{breaks.length === 0 ? 'No breaks loaded' : 'No matches found'}</span>
+                        <span className="text-[12px] text-[var(--text-secondary)]">Try adjusting your filters</span>
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 }
 

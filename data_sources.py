@@ -86,7 +86,33 @@ KNOWN_BONDS = {
         "isin": "US82509L2087",
         "cusip": "82509L208",
         "source": "SEDAR+ / Shopify Inc. prospectus supplement (Sept 2021)"
-    }
+    },
+    "UST-10Y-2034": {
+        "issuer": "US Treasury",
+        "coupon": 4.25,
+        "maturity": date(2034, 2, 15),
+        "issue_date": date(2024, 2, 15),
+        "face_value": 1_000,
+        "day_count": "Act/Act",
+        "frequency": 2,
+        "currency": "USD",
+        "isin": "US912810TW26",
+        "cusip": "912810TW2",
+        "source": "US Treasury Direct — 10-Year Note (Feb 2024 auction)"
+    },
+    "CAN-3.5-2026": {
+        "issuer": "Government of Canada",
+        "coupon": 3.50,
+        "maturity": date(2026, 6, 1),
+        "issue_date": date(2023, 6, 1),
+        "face_value": 1_000,
+        "day_count": "Act/365",
+        "frequency": 2,
+        "currency": "CAD",
+        "isin": "CA135087P443",
+        "cusip": "135087P44",
+        "source": "Bank of Canada — Government Bond Auction (Jun 2023)"
+    },
 }
 
 
@@ -370,6 +396,245 @@ def get_corporate_actions(ticker: str, instrument_type: str) -> dict:
 
 
 # ─────────────────────────────────────────
+# 4b. FX MARKET DATA (yfinance)
+# ─────────────────────────────────────────
+
+def get_fx_market_data(ticker: str, break_row: dict) -> dict:
+    """
+    Fetch live FX rates and 5-day history for FX breaks.
+    Supports spot pairs (USD/CAD) and uses yfinance FX symbols.
+    """
+    # Map break tickers to yfinance FX symbols
+    fx_symbol_map = {
+        "USD/CAD": "USDCAD=X",
+        "EUR/USD": "EURUSD=X",
+        "EUR/USD 3M": "EURUSD=X",
+        "GBP/USD": "GBPUSD=X",
+        "USD/JPY": "USDJPY=X",
+    }
+
+    # Also handle equity FX breaks (like ENB.TO FX rate diff)
+    if ticker not in fx_symbol_map:
+        # Try to infer from currency
+        currency = break_row.get("Currency", "")
+        if currency == "CAD":
+            fx_symbol_map[ticker] = "USDCAD=X"
+        elif currency == "USD":
+            fx_symbol_map[ticker] = "USDCAD=X"
+        else:
+            fx_symbol_map[ticker] = "USDCAD=X"  # default
+
+    yf_symbol = fx_symbol_map.get(ticker, "USDCAD=X")
+    base_pair = yf_symbol.replace("=X", "")
+
+    try:
+        t = yf.Ticker(yf_symbol)
+        hist = t.history(period="5d")
+
+        if hist.empty:
+            return {
+                "fx_pair": base_pair,
+                "error": f"No FX data for {yf_symbol}",
+                "source": "Yahoo Finance FX (unavailable)"
+            }
+
+        current_rate = round(float(hist['Close'].iloc[-1]), 4)
+        rates_5d = [
+            {"date": str(idx.date()), "rate": round(float(row['Close']), 4)}
+            for idx, row in hist.iterrows()
+        ]
+        high_5d = round(float(hist['High'].max()), 4)
+        low_5d = round(float(hist['Low'].min()), 4)
+        volatility = round((high_5d - low_5d) / current_rate * 100, 3)
+
+        return {
+            "fx_pair": base_pair,
+            "current_rate": current_rate,
+            "rates_5d": rates_5d,
+            "high_5d": high_5d,
+            "low_5d": low_5d,
+            "volatility_5d_pct": volatility,
+            "fix_context": {
+                "wmr_london_fix": "16:00 GMT (WM/Reuters)",
+                "ecb_fix": "14:15 CET (ECB reference rate)",
+                "boc_noon_fix": "12:00 EST (Bank of Canada, discontinued Mar 2017 — indicative only)",
+                "cls_settlement": "CLS Bank — multilateral netting, 5 settlement windows/day",
+            },
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S EST"),
+            "source": "Yahoo Finance FX rates (live)",
+            "error": None
+        }
+
+    except Exception as e:
+        return {
+            "fx_pair": base_pair,
+            "error": str(e),
+            "source": "Yahoo Finance FX (failed)"
+        }
+
+
+# ─────────────────────────────────────────
+# 4c. FIXED INCOME YIELD CURVE DATA
+# ─────────────────────────────────────────
+
+def get_fi_market_data(ticker: str, break_row: dict) -> dict:
+    """
+    Fetch treasury yield curve data and bond market context.
+    Uses yfinance treasury yield tickers as proxies.
+    """
+    # Treasury yield tickers in yfinance
+    yield_tickers = {
+        "2Y": "^IRX",    # 13-week T-bill (proxy for short end)
+        "5Y": "^FVX",    # 5-year Treasury yield
+        "10Y": "^TNX",   # 10-year Treasury yield
+        "30Y": "^TYX",   # 30-year Treasury yield
+    }
+
+    yields = {}
+    for tenor, yf_tick in yield_tickers.items():
+        try:
+            t = yf.Ticker(yf_tick)
+            hist = t.history(period="2d")
+            if not hist.empty:
+                current = round(float(hist['Close'].iloc[-1]), 3)
+                prev = round(float(hist['Close'].iloc[-2]), 3) if len(hist) > 1 else current
+                change = round(current - prev, 3)
+                yields[tenor] = {
+                    "yield_pct": current,
+                    "prev_close": prev,
+                    "change_bps": round(change * 100, 1),
+                }
+        except Exception:
+            yields[tenor] = {"yield_pct": None, "error": "unavailable"}
+
+    # Bond-specific context
+    bond_key = break_row.get("Bond Key", "")
+    bond_info = KNOWN_BONDS.get(bond_key, {})
+    currency = break_row.get("Currency", "USD")
+
+    return {
+        "ticker": ticker,
+        "yield_curve": yields,
+        "bond_reference": {
+            "issuer": bond_info.get("issuer", "Unknown"),
+            "coupon": bond_info.get("coupon"),
+            "maturity": str(bond_info.get("maturity", "")),
+            "day_count": bond_info.get("day_count", ""),
+            "cusip": bond_info.get("cusip", break_row.get("CUSIP", "")),
+            "isin": bond_info.get("isin", break_row.get("ISIN", "")),
+        } if bond_info else None,
+        "market_context": {
+            "pricing_convention": "Clean price (ex-accrued) for settlement; Dirty price (inc-accrued) for valuation",
+            "clearing": "Fedwire Securities Service" if currency == "USD" else "CDS CDSX Fixed Income",
+            "settlement": "T+1 for US Treasuries (Fedwire)" if currency == "USD" else "T+2 for Canadian govt bonds (CDS)",
+        },
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S EST"),
+        "source": "Yahoo Finance (Treasury yields) + Bond registry",
+        "error": None
+    }
+
+
+# ─────────────────────────────────────────
+# 4d. DERIVATIVE MARKET DATA
+# ─────────────────────────────────────────
+
+def get_derivative_market_data(ticker: str, break_row: dict) -> dict:
+    """
+    Fetch relevant market data for derivative breaks:
+    - Futures: underlying index level, futures price
+    - Swaps: reference rate context (SOFR, Fed Funds)
+    """
+    instrument_name = break_row.get("Security Name", "")
+    result = {
+        "ticker": ticker,
+        "underlying_data": None,
+        "clearing_context": None,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S EST"),
+        "source": "",
+        "error": None,
+    }
+
+    # Futures — fetch underlying index
+    if "future" in instrument_name.lower() or "ES" in ticker.upper():
+        underlying_tickers = {
+            "index": "^GSPC",       # S&P 500 spot index
+            "futures": "ES=F",      # E-mini S&P 500 front month
+            "vix": "^VIX",          # VIX — context for pricing gaps
+        }
+        underlying = {}
+        for label, yf_tick in underlying_tickers.items():
+            try:
+                t = yf.Ticker(yf_tick)
+                hist = t.history(period="2d")
+                if not hist.empty:
+                    current = round(float(hist['Close'].iloc[-1]), 2)
+                    prev = round(float(hist['Close'].iloc[-2]), 2) if len(hist) > 1 else current
+                    underlying[label] = {
+                        "value": current,
+                        "prev_close": prev,
+                        "change_pct": round((current - prev) / prev * 100, 2) if prev else 0,
+                    }
+            except Exception:
+                underlying[label] = {"value": None, "error": "unavailable"}
+
+        result["underlying_data"] = underlying
+        result["clearing_context"] = {
+            "clearing_house": "CME Clearing",
+            "settlement_type": "Daily mark-to-market (variation margin)",
+            "settlement_time": "16:00 CT (CME daily settlement price)",
+            "margin_type": "SPAN margin methodology",
+            "contract_specs": {
+                "multiplier": 50,
+                "tick_size": 0.25,
+                "tick_value": 12.50,
+                "settlement": "Cash settled (quarterly expiry)",
+            },
+        }
+        result["source"] = "Yahoo Finance (S&P 500, ES futures, VIX) + CME conventions"
+
+    # Interest Rate Swaps — fetch rate context
+    elif "irs" in ticker.lower() or "swap" in instrument_name.lower() or "sofr" in instrument_name.lower():
+        rate_tickers = {
+            "fed_funds_proxy": "^IRX",   # 13-week T-bill as short-rate proxy
+            "2y_treasury": "^IRX",
+            "10y_treasury": "^TNX",
+        }
+        rates = {}
+        for label, yf_tick in rate_tickers.items():
+            try:
+                t = yf.Ticker(yf_tick)
+                hist = t.history(period="2d")
+                if not hist.empty:
+                    current = round(float(hist['Close'].iloc[-1]), 3)
+                    rates[label] = {"rate_pct": current}
+            except Exception:
+                rates[label] = {"rate_pct": None, "error": "unavailable"}
+
+        result["underlying_data"] = rates
+        result["clearing_context"] = {
+            "clearing_house": "LCH SwapClear (LCH Clearnet)",
+            "settlement_type": "Daily MTM with variation margin exchange",
+            "valuation_methodology": "Discounted cash flow using OIS (SOFR) curve",
+            "reference_rate": "SOFR (Secured Overnight Financing Rate) — published by NY Fed",
+            "sofr_note": "SOFR replaced LIBOR as the primary USD benchmark (June 30, 2023 cessation)",
+            "curve_sources": {
+                "term_sofr": "CME Term SOFR (forward-looking, derived from futures)",
+                "overnight_sofr": "NY Fed SOFR (backward-looking, compounded in arrears)",
+                "note": "MTM divergence often stems from term vs overnight SOFR curve choice",
+            },
+        }
+        result["source"] = "Yahoo Finance (rate proxies) + LCH/SOFR conventions"
+
+    else:
+        result["clearing_context"] = {
+            "note": "Generic OTC derivative — clearing and valuation depend on product type",
+        }
+        result["source"] = "Generic derivative context"
+
+    return result
+
+
+# ─────────────────────────────────────────
 # 5. SETTLEMENT INFO (CDS / DTC rules)
 # ─────────────────────────────────────────
 # NOTE: In production, these connect to:
@@ -396,13 +661,38 @@ def get_settlement_info(ticker: str, instrument_type: str, currency: str, trade_
         settlement_rule = "T+1 (CIRO Rule — effective May 27, 2024)"
         depository = "CDS"
     elif instrument_type == "Fixed Income":
-        settlement_days = 2
-        settlement_rule = "T+2 (standard corporate bond settlement)"
-        depository = "DTC" if currency == "USD" else "CDS"
+        # US Treasuries settle T+1 via Fedwire; corporate bonds T+2 via DTC
+        is_govt = any(kw in ticker.upper() for kw in ["UST", "912", "CAN ", "135087"])
+        if is_govt and currency == "USD":
+            settlement_days = 1
+            settlement_rule = "T+1 (US Treasury — Fedwire Securities Service)"
+            depository = "Fedwire"
+        elif is_govt and currency == "CAD":
+            settlement_days = 2
+            settlement_rule = "T+2 (Canadian govt bonds — CDS CDSX)"
+            depository = "CDS"
+        else:
+            settlement_days = 2
+            settlement_rule = "T+2 (corporate bond — DTC/CDS)"
+            depository = "DTC" if currency == "USD" else "CDS"
+    elif instrument_type == "FX":
+        # Spot FX = T+2, same-day = T+0, forwards = variable
+        if "forward" in ticker.lower() or "fwd" in ticker.lower() or "3m" in ticker.lower():
+            settlement_days = 0  # settled at maturity
+            settlement_rule = "Maturity settlement (FX forward contract)"
+            depository = "CLS Bank"
+        else:
+            settlement_days = 2
+            settlement_rule = "T+2 (spot FX — CLS Bank multilateral netting)"
+            depository = "CLS Bank"
+    elif instrument_type == "Derivative":
+        settlement_days = 0  # daily variation margin
+        settlement_rule = "Daily mark-to-market (variation margin exchange)"
+        depository = "CME Clearing" if "ES" in ticker or "future" in ticker.lower() else "LCH Clearnet"
     elif instrument_type == "Option":
         settlement_days = 1
         settlement_rule = "T+1 (options standard)"
-        depository = "CDS"
+        depository = "OCC"
     else:
         settlement_days = 2
         settlement_rule = "T+2 (default)"
@@ -435,7 +725,7 @@ def fetch_all_data_for_break(break_row: dict) -> dict:
     """
     Given a break row from the Excel report, fetch all relevant
     external data needed for AI analysis.
-    Returns a structured context dict.
+    Routes to instrument-specific enrichment functions.
     """
     ticker = break_row.get("Ticker", "")
     instrument_type = break_row.get("Instrument Type", "Equity")
@@ -449,43 +739,72 @@ def fetch_all_data_for_break(break_row: dict) -> dict:
         "corporate_actions": None,
         "settlement_info": None,
         "fixed_income_accrual": None,
+        "fi_market_data": None,
+        "fx_market_data": None,
+        "derivative_market_data": None,
         "data_sources_used": []
     }
 
-    # Always fetch live price for equities and ETFs
+    # ── Equity / ETF enrichment ──
     if instrument_type in ["Equity", "ETF"] and ticker:
         price_data = get_live_price(ticker)
         context["live_price"] = price_data
         if not price_data.get("error"):
             context["data_sources_used"].append("Yahoo Finance (live price)")
 
-    # Fetch corporate actions if relevant
-    if break_type in ["Corporate Action", "Pricing Difference", "Quantity Mismatch"]:
+    # Corporate actions (equities, ETFs, and relevant break types)
+    if instrument_type in ["Equity", "ETF"] and break_type in [
+        "Corporate Action", "Pricing Difference", "Quantity Mismatch",
+        "Corporate Action - Stock Split", "Corporate Action - Dividend",
+        "Corporate Action - Merger",
+    ]:
         ca_data = get_corporate_actions(ticker, instrument_type)
         context["corporate_actions"] = ca_data
         if not ca_data.get("error"):
             context["data_sources_used"].append(ca_data.get("source", "Yahoo Finance (corporate actions)"))
 
-    # Settlement info
+    # ── FX enrichment ──
+    if instrument_type == "FX" or break_type == "FX Rate Difference":
+        fx_data = get_fx_market_data(ticker, break_row)
+        context["fx_market_data"] = fx_data
+        if not fx_data.get("error"):
+            context["data_sources_used"].append(fx_data.get("source", "Yahoo Finance FX rates"))
+
+    # ── Fixed Income enrichment ──
+    if instrument_type == "Fixed Income":
+        # Yield curve data
+        fi_data = get_fi_market_data(ticker, break_row)
+        context["fi_market_data"] = fi_data
+        if not fi_data.get("error"):
+            context["data_sources_used"].append(fi_data.get("source", "Yahoo Finance (Treasury yields)"))
+
+        # Accrued interest computation
+        bond_key = break_row.get("Bond Key", "")
+        if bond_key and bond_key in KNOWN_BONDS:
+            internal_qty = break_row.get("Internal Qty", 1)
+            face_value_held = float(internal_qty)  # Already in face value for govt bonds
+            accrual_data = compute_accrued_interest(
+                bond_key, date.today(), face_value_held
+            )
+            context["fixed_income_accrual"] = accrual_data
+            if not accrual_data.get("error"):
+                context["data_sources_used"].append(
+                    f"Accrued interest — {accrual_data.get('computation_method', 'Act/360')}"
+                )
+
+    # ── Derivative enrichment ──
+    if instrument_type == "Derivative":
+        deriv_data = get_derivative_market_data(ticker, break_row)
+        context["derivative_market_data"] = deriv_data
+        if not deriv_data.get("error"):
+            context["data_sources_used"].append(deriv_data.get("source", "Derivative market data"))
+
+    # ── Settlement info (all types) ──
     context["settlement_info"] = get_settlement_info(
         ticker, instrument_type, currency, str(trade_date)
     )
     context["data_sources_used"].append(
-        f"{context['settlement_info']['depository']} settlement rules (simulated)"
+        f"{context['settlement_info']['depository']} settlement rules"
     )
-
-    # Fixed income accrual
-    if instrument_type == "Fixed Income":
-        bond_key = break_row.get("Bond Key", "SHOP 4.75 2031")
-        internal_qty = break_row.get("Internal Qty", 1)
-        face_value_held = float(internal_qty) * 1000  # bonds x $1,000 face
-        accrual_data = compute_accrued_interest(
-            bond_key, date.today(), face_value_held
-        )
-        context["fixed_income_accrual"] = accrual_data
-        if not accrual_data.get("error"):
-            context["data_sources_used"].append(
-                f"Accrued interest — {accrual_data.get('computation_method', 'Act/360')}"
-            )
 
     return context

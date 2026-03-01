@@ -12,7 +12,8 @@ import os
 import json
 import uuid
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Optional
 
 import pandas as pd
@@ -23,7 +24,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 
 from data_sources import fetch_all_data_for_break
-from analyzer import analyze_break_streaming, get_quick_triage
+from analyzer import analyze_break_streaming, get_quick_triage, generate_investigation_summary
 from generate_sample import generate_sample_breaks
 
 load_dotenv()
@@ -48,9 +49,41 @@ session = {
     "triage_results": {},   # break_id -> triage dict
     "analysis_results": {}, # break_id -> analysis text
     "decisions": {},        # break_id -> decision dict
-    "audit_log": [],        # list of audit entries
     "api_status": "active",
 }
+
+# ─── Persistent audit log ─────────────────────────────
+AUDIT_LOG_FILE = Path(__file__).parent / "audit_log.json"
+
+def _load_audit_log() -> list:
+    """Load audit log from disk, auto-delete entries older than 30 days."""
+    if not AUDIT_LOG_FILE.exists():
+        return []
+    try:
+        with open(AUDIT_LOG_FILE, "r") as f:
+            entries = json.load(f)
+        cutoff = (datetime.now() - timedelta(days=30)).isoformat()
+        entries = [e for e in entries if e.get("timestamp", "") > cutoff]
+        return entries
+    except Exception:
+        return []
+
+def _save_audit_log(entries: list):
+    """Save audit log to disk."""
+    try:
+        with open(AUDIT_LOG_FILE, "w") as f:
+            json.dump(entries, f, indent=2, default=str)
+    except Exception as e:
+        print(f"Warning: failed to save audit log: {e}")
+
+def _append_audit(entry: dict):
+    """Append an audit entry and persist to disk."""
+    entries = _load_audit_log()
+    entries.append(entry)
+    _save_audit_log(entries)
+
+# Load on startup
+_load_audit_log()
 
 
 def get_api_key() -> str:
@@ -169,9 +202,8 @@ def load_sample():
         session["triage_results"] = {}
         session["analysis_results"] = {}
         session["decisions"] = {}
-        session["audit_log"] = []
 
-        session["audit_log"].append({
+        _append_audit({
             "id": str(uuid.uuid4()),
             "type": "system",
             "action": f"Sample break report loaded ({len(selected_breaks)} breaks)",
@@ -207,7 +239,7 @@ async def upload_file(file: UploadFile = File(...)):
         session["analysis_results"] = {}
         session["decisions"] = {}
 
-        session["audit_log"].append({
+        _append_audit({
             "id": str(uuid.uuid4()),
             "type": "upload",
             "action": f"Uploaded {file.filename}",
@@ -263,7 +295,7 @@ def run_triage():
                 session["triage_results"][break_id] = triage_item
                 session["breaks"][idx]["status"] = "triaged"
 
-        session["audit_log"].append({
+        _append_audit({
             "id": str(uuid.uuid4()),
             "type": "triage",
             "action": f"Quick triage completed for {len(result.get('triages', []))} breaks",
@@ -392,9 +424,19 @@ def investigate_break(break_id: str):
             sources = context.get("data_sources_used", [])
             yield make_event({"type": "sources", "sources": sources})
 
+            # Generate authentic AI summary
+            yield make_event({"type": "step", "step": "summary", "label": "Generating investigation summary..."})
+            try:
+                summary_json = generate_investigation_summary(full_text, break_row, sources, api_key)
+                yield make_event({"type": "summary", "summary": summary_json})
+            except Exception as e:
+                print(f"Summary generation failed: {e}")
+                yield make_event({"type": "summary", "summary": "[]"})
+            yield make_event({"type": "step_done", "step": "summary", "result": "Summary ready"})
+
             yield make_event({"type": "complete"})
 
-            session["audit_log"].append({
+            _append_audit({
                 "id": str(uuid.uuid4()),
                 "type": "investigation",
                 "action": f"AI investigation completed for {ticker}",
@@ -434,7 +476,7 @@ def submit_decision(req: DecisionRequest):
 
     session["decisions"][req.break_id] = decision
 
-    session["audit_log"].append({
+    _append_audit({
         "id": str(uuid.uuid4()),
         "type": req.decision_type,
         "action": f"{req.analyst} {'approved escalation' if req.decision_type == 'escalate' else 'overrode AI recommendation'} for break {req.break_id}",
@@ -449,7 +491,7 @@ def submit_decision(req: DecisionRequest):
 @app.get("/api/audit")
 def get_audit_log():
     """Return the audit log."""
-    return {"entries": session["audit_log"]}
+    return {"entries": _load_audit_log()}
 
 
 @app.get("/api/break/{break_id}")

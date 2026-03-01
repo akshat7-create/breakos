@@ -50,7 +50,7 @@ export function PatternIntelligenceCard({ forBreakId }: { forBreakId?: string })
             .then((res: any) => setInsight(res.insight))
             .catch((err: any) => {
                 console.error("Pattern synthesis failed:", err);
-                setInsight("Systemic pattern analysis temporarily unavailable. Proceed with individual break investigations.");
+                setInsight("");
             })
             .finally(() => setIsAnalyzing(false));
 
@@ -120,20 +120,15 @@ export function PatternIntelligenceCard({ forBreakId }: { forBreakId?: string })
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-            className="bg-[var(--surface)] rounded-[20px] border-l-4 border-[var(--accent)] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.15)] mb-6"
+            className="bg-[var(--surface)] rounded-3xl border border-[var(--border-subtle)] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] mb-6"
         >
             {/* HEADER ROW */}
-            <div className="flex items-start justify-between">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Network size={16} className="text-[var(--accent)]" />
-                        <h3 className="text-[11px] font-bold text-[var(--accent)] uppercase tracking-[0.08em]">
-                            Pattern Intelligence
-                        </h3>
-                    </div>
-                    <p className="text-[12px] text-[var(--text-secondary)]">
-                        {breaks.length} breaks · ${totalMV.toLocaleString(undefined, { maximumFractionDigits: 0 })} exposure · {historyMatches.length} historical matches found
-                    </p>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] bg-[var(--bg)]">
+                <div className="flex items-center gap-2">
+                    <Network size={14} className="text-[var(--text-muted)]" />
+                    <h3 className="text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-widest">
+                        Pattern Intelligence
+                    </h3>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -151,137 +146,150 @@ export function PatternIntelligenceCard({ forBreakId }: { forBreakId?: string })
                 </div>
             </div>
 
-            <div className="h-[1px] w-full bg-[var(--border)] my-4" />
+            <div className="px-6 py-4">
+                <p className="text-[12px] text-[var(--text-secondary)] mb-4">
+                    {breaks.length} breaks · ${totalMV.toLocaleString(undefined, { maximumFractionDigits: 0 })} exposure · {historyMatches.length} historical matches found
+                </p>
 
-            {/* AI INSIGHT */}
-            <div className="min-h-[60px]">
-                {isAnalyzing ? (
-                    <div className="animate-pulse flex flex-col gap-2 pt-1">
-                        <div className="h-4 bg-[var(--surface-overlay)] rounded w-full"></div>
-                        <div className="h-4 bg-[var(--surface-overlay)] rounded w-[90%]"></div>
-                        <div className="h-4 bg-[var(--surface-overlay)] rounded w-[75%]"></div>
+                {/* AI INSIGHT */}
+                {(isAnalyzing || insight) && (
+                    <div className="min-h-[60px]">
+                        {isAnalyzing ? (
+                            <div className="animate-pulse flex flex-col gap-2 pt-1">
+                                <div className="h-4 bg-[var(--surface-overlay)] rounded w-full"></div>
+                                <div className="h-4 bg-[var(--surface-overlay)] rounded w-[90%]"></div>
+                                <div className="h-4 bg-[var(--surface-overlay)] rounded w-[75%]"></div>
+                            </div>
+                        ) : (
+                            resolutionText ? (
+                                <div className="flex flex-col gap-3">
+                                    <div className="bg-[var(--bg)] border border-[var(--border)] rounded-xl p-4">
+                                        <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Detected Issue</span>
+                                        <p className="text-[14px] text-[var(--text-primary)] leading-[1.6]">{issueText}</p>
+                                    </div>
+                                    <div className="bg-[rgba(139,92,246,0.08)] border border-[rgba(139,92,246,0.2)] rounded-xl p-4">
+                                        <span className="text-[10px] font-bold text-[#a78bfa] uppercase tracking-wider block mb-1">Recommended Resolution</span>
+                                        <p className="text-[14px] text-[#ddd6fe] leading-[1.6]">{resolutionText}</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <p className="text-[14px] font-[var(--font-sans)] text-[var(--text-primary)] leading-[1.75]">{insight}</p>
+                            )
+                        )}
                     </div>
-                ) : (
-                    resolutionText ? (
-                        <div className="flex flex-col gap-3">
-                            <div className="bg-[var(--bg)] border border-[var(--border)] rounded-xl p-4">
-                                <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider block mb-1">Detected Issue</span>
-                                <p className="text-[14px] text-[var(--text-primary)] leading-[1.6]">{issueText}</p>
-                            </div>
-                            <div className="bg-[rgba(139,92,246,0.08)] border border-[rgba(139,92,246,0.2)] rounded-xl p-4">
-                                <span className="text-[10px] font-bold text-[#a78bfa] uppercase tracking-wider block mb-1">Recommended Resolution</span>
-                                <p className="text-[14px] text-[#ddd6fe] leading-[1.6]">{resolutionText}</p>
-                            </div>
-                        </div>
-                    ) : (
-                        <p className="text-[14px] font-[var(--font-sans)] text-[var(--text-primary)] leading-[1.75]">{insight}</p>
-                    )
                 )}
-            </div>
 
-            {/* TODAY'S SIGNALS */}
-            {signals.length > 0 && (
-                <div className="mt-5">
-                    <span className="text-[10px] uppercase text-[var(--text-muted)] font-bold tracking-wider block mb-2">TODAY</span>
-                    <div className="flex flex-wrap gap-2">
-                        {signals.map((s, i) => (
-                            <motion.div
-                                key={s.fingerprint}
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                transition={{ type: "spring", delay: i * 0.06 }}
-                                className={cn(
-                                    "px-[14px] py-[6px] rounded-full text-[12px] font-medium flex items-center gap-2 border",
-                                    getSignalColor(s),
-                                    s.urgent && "animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.3)]"
-                                )}
-                            >
-                                {getSignalIcon(s.type)}
-                                {s.label}
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* HISTORICAL MATCHES */}
-            {historyMatches.length > 0 && (
-                <>
-                    <div className="h-[1px] w-full bg-[var(--border)] mt-6 mb-4" />
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                            <History size={14} className="text-[var(--text-muted)]" />
-                            <span className="text-[10px] uppercase text-[var(--text-muted)] font-bold tracking-wider">Recurring Patterns</span>
+                {/* TODAY'S SIGNALS */}
+                {signals.length > 0 && (
+                    <div className="mt-5">
+                        <div className="flex items-center gap-2 mb-3">
+                            <span className="text-[10px] uppercase text-[var(--text-muted)] font-bold tracking-wider">Auto-Detected Pre-Investigation Clusters</span>
                         </div>
-                        <span className="text-[10px] text-[var(--text-muted)] font-medium">Past 30 days</span>
-                    </div>
-
-                    <div className="space-y-0">
-                        {historyMatches.map((m, i) => {
-                            const mostRecent = m.occurrences[0];
-                            const dotColor = m.totalOccurrences >= 3 ? 'bg-[var(--accent)]' : m.totalOccurrences === 2 ? 'bg-[var(--amber)]' : 'bg-[var(--text-muted)]';
-
-                            let lastSeenText = '';
-                            if (mostRecent.daysAgo === 0) lastSeenText = 'also yesterday';
-                            else if (mostRecent.daysAgo === 1) lastSeenText = 'last seen yesterday';
-                            else lastSeenText = `last seen ${mostRecent.daysAgo} days ago`;
-
-                            return (
+                        <div className="flex flex-col gap-2">
+                            {signals.map((s, i) => (
                                 <motion.div
-                                    key={m.fingerprint}
-                                    initial={{ x: -12, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    transition={{ duration: 0.3, ease: "easeOut", delay: i * 0.08 }}
-                                    className="flex items-center h-[48px] border-b border-[var(--border-subtle)] last:border-0"
+                                    key={s.fingerprint}
+                                    initial={{ y: 5, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ duration: 0.3, delay: i * 0.06 }}
+                                    className={cn(
+                                        "px-4 py-3 rounded-xl bg-[var(--surface-overlay)] border border-[var(--border-subtle)] flex items-center gap-3",
+                                        s.urgent && "shadow-[0_0_10px_rgba(239,68,68,0.1)] border-[#ef444450]"
+                                    )}
                                 >
-                                    <div className={cn("w-2 h-2 rounded-full flex-shrink-0 mr-3", dotColor)} />
-
-                                    <div className="flex-1 min-w-0 pr-4">
-                                        <h4 className="text-[13px] font-medium w-full truncate text-[var(--text-primary)]">
-                                            {getPatternName(m.fingerprint)}
-                                        </h4>
-                                        <p className="text-[12px] text-[var(--text-secondary)]">
-                                            {m.totalOccurrences} time{m.totalOccurrences > 1 ? 's' : ''} in 30 days · Last: {mostRecent.daysAgo} days ago
+                                    <div className={cn("p-2 rounded-lg flex-shrink-0 flex items-center justify-center", getSignalColor(s))}>
+                                        {getSignalIcon(s.type)}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-[13px] font-medium text-[var(--text-primary)] truncate">{s.label}</p>
+                                        <p className="text-[11px] text-[var(--text-secondary)] mt-0.5 truncate">
+                                            Detected across {s.affectedBreakIds.length} raw open breaks
                                         </p>
                                     </div>
-
-                                    <div className="flex-shrink-0">
-                                        {mostRecent.resolution ? (
-                                            <div
-                                                className="px-2.5 py-1 bg-[var(--surface-overlay)] border border-[var(--border)] rounded-full text-[10px] text-[var(--text-secondary)] max-w-[180px] truncate cursor-help"
-                                                title={`Resolution from ${mostRecent.daysAgo} days ago: ${mostRecent.resolution}`}
-                                            >
-                                                ✓ {mostRecent.resolution}
-                                            </div>
-                                        ) : (
-                                            <span className="text-[10px] text-[var(--text-muted)] italic">No resolution logged</span>
-                                        )}
-                                    </div>
                                 </motion.div>
-                            );
-                        })}
+                            ))}
+                        </div>
                     </div>
-                </>
-            )}
+                )}
 
-            {/* AFFECTED BREAKS ROW */}
-            {affectedTickers.length > 0 && (
-                <div className="mt-5 pt-4 border-t border-[var(--border-subtle)]">
-                    <span className="text-[10px] uppercase text-[var(--text-muted)] font-bold tracking-wider block mb-2">Affected This Session</span>
-                    <div className="flex flex-wrap gap-2">
-                        {affectedTickers.map(ticker => (
-                            <button
-                                key={ticker}
-                                onClick={() => setActiveView('queue')}
-                                className="px-[10px] py-[3px] bg-[var(--surface-overlay)] border border-[var(--border)] rounded-full text-[12px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-secondary)] transition-colors"
-                            >
-                                {ticker}
-                            </button>
-                        ))}
+                {/* HISTORICAL MATCHES */}
+                {historyMatches.length > 0 && (
+                    <>
+                        <div className="h-[1px] w-full bg-[var(--border)] mt-6 mb-4" />
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <History size={14} className="text-[var(--text-muted)]" />
+                                <span className="text-[10px] uppercase text-[var(--text-muted)] font-bold tracking-wider">Recurring Patterns</span>
+                            </div>
+                            <span className="text-[10px] text-[var(--text-muted)] font-medium">Past 30 days</span>
+                        </div>
+
+                        <div className="space-y-0">
+                            {historyMatches.map((m, i) => {
+                                const mostRecent = m.occurrences[0];
+                                const dotColor = m.totalOccurrences >= 3 ? 'bg-[var(--accent)]' : m.totalOccurrences === 2 ? 'bg-[var(--amber)]' : 'bg-[var(--text-muted)]';
+
+                                let lastSeenText = '';
+                                if (mostRecent.daysAgo === 0) lastSeenText = 'also yesterday';
+                                else if (mostRecent.daysAgo === 1) lastSeenText = 'last seen yesterday';
+                                else lastSeenText = `last seen ${mostRecent.daysAgo} days ago`;
+
+                                return (
+                                    <motion.div
+                                        key={m.fingerprint}
+                                        initial={{ x: -12, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        transition={{ duration: 0.3, ease: "easeOut", delay: i * 0.08 }}
+                                        className="flex items-center h-[48px] border-b border-[var(--border-subtle)] last:border-0"
+                                    >
+                                        <div className={cn("w-2 h-2 rounded-full flex-shrink-0 mr-3", dotColor)} />
+
+                                        <div className="flex-1 min-w-0 pr-4">
+                                            <h4 className="text-[13px] font-medium w-full truncate text-[var(--text-primary)]">
+                                                {getPatternName(m.fingerprint)}
+                                            </h4>
+                                            <p className="text-[12px] text-[var(--text-secondary)]">
+                                                {m.totalOccurrences} time{m.totalOccurrences > 1 ? 's' : ''} in 30 days · Last: {mostRecent.daysAgo} days ago
+                                            </p>
+                                        </div>
+
+                                        <div className="flex-shrink-0">
+                                            {mostRecent.resolution ? (
+                                                <div
+                                                    className="px-2.5 py-1 bg-[var(--surface-overlay)] border border-[var(--border)] rounded-full text-[10px] text-[var(--text-secondary)] max-w-[180px] truncate cursor-help"
+                                                    title={`Resolution from ${mostRecent.daysAgo} days ago: ${mostRecent.resolution}`}
+                                                >
+                                                    ✓ {mostRecent.resolution}
+                                                </div>
+                                            ) : (
+                                                <span className="text-[10px] text-[var(--text-muted)] italic">No resolution logged</span>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </>
+                )}
+
+                {/* AFFECTED BREAKS ROW */}
+                {affectedTickers.length > 0 && (
+                    <div className="mt-5 pt-4 border-t border-[var(--border-subtle)]">
+                        <span className="text-[10px] uppercase text-[var(--text-muted)] font-bold tracking-wider block mb-2">Affected This Session</span>
+                        <div className="flex flex-wrap gap-2">
+                            {affectedTickers.map(ticker => (
+                                <button
+                                    key={ticker}
+                                    onClick={() => setActiveView('queue')}
+                                    className="px-[10px] py-[3px] bg-[var(--surface-overlay)] border border-[var(--border)] rounded-full text-[12px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--text-secondary)] transition-colors"
+                                >
+                                    {ticker}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
-
+                )}
+            </div>
         </motion.div>
     );
 }

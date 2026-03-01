@@ -63,9 +63,10 @@ export function AuditLogView() {
         return () => clearInterval(interval);
     }, []);
 
-    const filteredEntries = filterType === 'all'
+    const filteredEntries = (filterType === 'all'
         ? entries
-        : entries.filter(e => e.type === filterType);
+        : entries.filter(e => e.type === filterType)
+    ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     const uniqueTypes = ['all', ...new Set(entries.map(e => e.type))];
 

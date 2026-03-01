@@ -22,6 +22,7 @@ interface BreakOSState {
   analysisText: Record<string, string>;
   loadingSteps: Record<string, LoadingStep[]>;
   dataSources: Record<string, string[]>;
+  investigationSummary: Record<string, string[]>;
   apiStatus: 'active' | 'error' | 'checking';
 
   toggleTheme: () => void;
@@ -34,6 +35,7 @@ interface BreakOSState {
   clearAnalysisText: (breakId: string) => void;
   setLoadingSteps: (breakId: string, steps: LoadingStep[] | ((prev: LoadingStep[]) => LoadingStep[])) => void;
   setDataSources: (breakId: string, sources: string[]) => void;
+  setInvestigationSummary: (breakId: string, bullets: string[]) => void;
   setApiStatus: (s: 'active' | 'error' | 'checking') => void;
   decisions: Record<string, any>;
   addDecision: (breakId: string, decision: any) => void;
@@ -49,6 +51,7 @@ export const useStore = create<BreakOSState>((set, get) => ({
   analysisText: {},
   loadingSteps: {},
   dataSources: {},
+  investigationSummary: {},
   apiStatus: 'checking',
   decisions: {},
 
@@ -81,6 +84,7 @@ export const useStore = create<BreakOSState>((set, get) => ({
     analysisText: {},
     loadingSteps: {},
     dataSources: {},
+    investigationSummary: {},
     decisions: {},
     selectedBreakId: null,
     triageStatus: 'idle'
@@ -108,6 +112,9 @@ export const useStore = create<BreakOSState>((set, get) => ({
 
   setDataSources: (breakId, sources) =>
     set((state) => ({ dataSources: { ...state.dataSources, [breakId]: sources } })),
+
+  setInvestigationSummary: (breakId, bullets) =>
+    set((state) => ({ investigationSummary: { ...state.investigationSummary, [breakId]: bullets } })),
 
   setApiStatus: (s) => set({ apiStatus: s }),
 }));

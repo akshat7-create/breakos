@@ -1,11 +1,10 @@
 import { useStore, ViewId } from '../../store';
-import { LayoutDashboard, AlertCircle, Search, ScrollText, Settings, Activity } from 'lucide-react';
+import { LayoutDashboard, AlertCircle, ScrollText, Settings, Activity } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 const navItems: { id: ViewId; label: string; icon: typeof LayoutDashboard; useBadge?: boolean }[] = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'queue', label: 'Break Queue', icon: AlertCircle, useBadge: true },
-    { id: 'investigation', label: 'Investigation', icon: Search },
     { id: 'audit', label: 'Audit Log', icon: ScrollText },
     { id: 'settings', label: 'Settings', icon: Settings },
 ];

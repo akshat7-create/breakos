@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { AppLayout } from './components/layout/AppLayout';
 import { OverviewView } from './components/views/OverviewView';
-import { InvestigationPage } from './components/views/InvestigationPage';
 import { AuditLogView } from './components/views/AuditLogView';
 import { SettingsView } from './components/views/SettingsView';
 import { BreakQueue } from './components/queue/BreakQueue';
@@ -68,9 +67,6 @@ export default function App() {
                     </div>
                 );
             }
-
-            case 'investigation':
-                return <InvestigationPage />;
 
             case 'audit':
                 return <AuditLogView />;

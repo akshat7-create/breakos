@@ -1,7 +1,7 @@
 """
 app.py — BreakOS
 AI-Native Reconciliation Break Investigator
-Built for Wealthsimple AI Builder application by Akshat Aneja
+Built by Akshat Aneja
 
 Run: streamlit run app.py
 """
@@ -704,7 +704,7 @@ with st.sidebar:
     st.markdown(f"""
     <div style="font-size:10px;color:var(--text-muted);line-height:1.7;font-family:'Inter',sans-serif;">
     Built by Akshat Aneja<br>
-    Wealthsimple AI Builder Application<br>
+    BreakOS Application<br>
     <div style="width:100%;height:1px;background:linear-gradient(90deg,var(--gradient-start),var(--gradient-end),transparent);margin:8px 0;"></div>
     Former: Fund Oversight Analyst<br>
     Scotiabank Asset Management<br>

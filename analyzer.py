@@ -48,7 +48,7 @@ Urgency: IMMEDIATE / SAME-DAY / NEXT-DAY
 Deadline: [time if applicable, e.g. "before 16:00 EST NAV cut-off"]
 
 [DRAFT EMAIL]
-To: [team-inbox@wealthsimple.com]
+To: [team-inbox@brokerage.com]
 Subject: [Security] [Break Type] — [Urgency] — [Date]
 
 Hi [team],
@@ -199,6 +199,51 @@ def analyze_break_streaming(context: dict, api_key: str) -> Generator[str, None,
     ) as stream:
         for text in stream.text_stream:
             yield text
+
+
+def generate_investigation_summary(full_analysis: str, break_row: dict, data_sources: list, api_key: str) -> str:
+    """
+    Fast non-streaming call to generate a genuine executive summary
+    of the investigation. Returns a JSON array of bullet strings.
+    """
+    client = anthropic.Anthropic(api_key=api_key)
+
+    ticker = break_row.get("Ticker", "Unknown")
+    instrument = break_row.get("Security Name", "Unknown")
+    break_type = break_row.get("Break Type", "Reconciliation Break")
+    txn_type = break_row.get("Transaction Type", "N/A")
+    sources_str = ", ".join(data_sources) if data_sources else "IBOR, DTC/CDS"
+
+    prompt = f"""You just completed an investigation on a break for {ticker} ({instrument}).
+Transaction type: {txn_type}
+Break type: {break_type}
+Data sources checked: {sources_str}
+
+Here is the full analysis you produced:
+---
+{full_analysis}
+---
+
+Now write a concise executive summary as a JSON array of 4-5 short bullet strings. Each bullet should be 1 sentence max. Cover:
+1. What you investigated (the specific break, ticker, and what type of issue)
+2. What data sources you cross-referenced (be specific — name them)  
+3. What you found (the specific root cause — if it's a corporate action, name it; if it's a timing lag, say so clearly)
+4. Your confidence level and what was ruled out
+5. Your recommended next step (route to which team, urgency)
+
+Return ONLY a valid JSON array of strings, nothing else. Example:
+["Investigated HD $16,243 pricing break triggered by merger exchange ratio mismatch between IBOR and CDS.", "Cross-referenced live market data from Yahoo Finance, CDS depository records, and IBOR position files.", "Root cause: corporate action — HD/CPKC merger with 2.884 exchange ratio not yet reflected in IBOR pricing feed.", "85% confidence this is a timing lag; ruled out manual entry error and pricing vendor fault.", "Route to Corporate Actions desk for IBOR price adjustment before 4PM NAV cut-off — urgency: SAME-DAY."]"""
+
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=400,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        return response.content[0].text.strip()
+    except Exception as e:
+        print(f"Summary generation error: {e}")
+        return '[]'
 
 
 def get_quick_triage(breaks_list: list, api_key: str) -> dict:

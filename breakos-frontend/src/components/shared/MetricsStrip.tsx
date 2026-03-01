@@ -12,12 +12,12 @@ export function MetricsStrip() {
     if (total === 0) return null;
 
     return (
-        <div className="bg-[var(--surface)] rounded-2xl px-6 py-4 mb-4 shadow-[0_1px_3px_rgba(0,0,0,0.12)] flex items-center gap-8">
+        <div className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl px-8 py-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-between gap-8 w-full">
             <Metric label="Total" value={total} />
             <Sep />
-            <Metric label="High" value={high} color="text-[var(--red)]" />
+            <Metric label="High Risk" value={high} color="text-[var(--red)]" />
             <Sep />
-            <Metric label="Medium" value={medium} color="text-[var(--amber)]" />
+            <Metric label="Medium Risk" value={medium} color="text-[var(--amber)]" />
             <Sep />
             <Metric label="Triaged" value={`${triaged}/${total}`} />
             <Sep />
@@ -28,13 +28,13 @@ export function MetricsStrip() {
 
 function Metric({ label, value, color }: { label: string; value: number | string; color?: string }) {
     return (
-        <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-[0.06em] text-[var(--text-muted)] font-semibold mb-1">{label}</span>
-            <span className={`text-[24px] font-semibold leading-none font-tabular ${color || 'text-[var(--text-primary)]'}`}>{value}</span>
+        <div className="flex flex-col flex-1 items-start">
+            <span className="text-[11px] uppercase tracking-widest text-[var(--text-muted)] font-semibold mb-1.5">{label}</span>
+            <span className={`text-[26px] font-medium leading-none font-tabular tracking-tight ${color || 'text-[var(--text-primary)]'}`}>{value}</span>
         </div>
     );
 }
 
 function Sep() {
-    return <div className="w-px h-8 bg-[var(--border)]" />;
+    return <div className="w-px h-10 bg-[var(--border-subtle)] flex-shrink-0" />;
 }

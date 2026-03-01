@@ -112,7 +112,7 @@ def _scenario_cnr_qty(prices, today, t1, t2):
 
 
 def _scenario_loblaw_split(prices, today, t1, t2):
-    """L.TO — Post Loblaw 4:1 stock split position mismatch (Aug 2025)"""
+    """L.TO — Post Loblaw 4:1 stock split position mismatch"""
     live = prices["L.TO"]
     pre_split_qty = random.choice([500, 750, 1000, 1200])
     post_split_qty = pre_split_qty * 4
@@ -120,6 +120,7 @@ def _scenario_loblaw_split(prices, today, t1, t2):
     mv_int = round(post_split_qty * live, 2)
     mv_str = round(street_qty * live, 2)
     mv_diff = round(mv_int - mv_str, 2)
+    split_date = str(today - timedelta(days=random.randint(1, 2)))
     return {
         "Ticker": "L.TO", "Security Name": "Loblaw Companies Ltd.",
         "CUSIP": "539481101", "ISIN": "CA5394811015",
@@ -131,64 +132,67 @@ def _scenario_loblaw_split(prices, today, t1, t2):
         "Settlement Date": str(today), "Trade Date": str(t1),
         "Break Type": "Corporate Action - Stock Split", "Counterparty": "CDS",
         "Tolerance Flag": "BREACH",
-        "Break Age (days)": random.randint(1, 3), "Bond Key": "",
-        "DESC": f"Post 4-for-1 stock split (completed Aug 2025). IBOR correctly reflects {post_split_qty:,} "
+        "Break Age (days)": random.randint(0, 2), "Bond Key": "",
+        "DESC": f"Post 4-for-1 stock split (effective {split_date}). IBOR correctly reflects {post_split_qty:,} "
                 f"post-split shares but CDS depot shows {street_qty:,}. {post_split_qty - street_qty:,} share "
                 f"discrepancy suggests incomplete split processing at depository level."
     }
 
 
 def _scenario_weston_split(prices, today, t1, t2):
-    """WN.TO — George Weston 3:1 split residual break (Aug 2025)"""
+    """WN.TO — George Weston 3:1 split residual break"""
     live = prices["WN.TO"]
     pre_qty = random.choice([300, 500, 800])
     post_qty = pre_qty * 3
-    old_price = live * 3
+    street_qty = post_qty - random.randint(10, 50)
     mv_int = round(post_qty * live, 2)
-    mv_str = round(pre_qty * old_price, 2)
+    mv_str = round(street_qty * live, 2)
     mv_diff = round(mv_int - mv_str, 2)
+    split_date = str(today - timedelta(days=random.randint(1, 2)))
     return {
         "Ticker": "WN.TO", "Security Name": "George Weston Ltd.",
         "CUSIP": "961148509", "ISIN": "CA9611485090",
         "Instrument Type": "Equity", "Currency": "CAD",
-        "Internal Qty": post_qty, "Street Qty": pre_qty,
-        "Qty Diff": post_qty - pre_qty,
-        "Internal Price": live, "Street Price": old_price, "Price Diff %": "-66.7%",
+        "Internal Qty": post_qty, "Street Qty": street_qty,
+        "Qty Diff": post_qty - street_qty,
+        "Internal Price": live, "Street Price": live, "Price Diff %": "0.00%",
         "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
-        "Settlement Date": str(today), "Trade Date": str(t2),
+        "Settlement Date": str(today), "Trade Date": str(t1),
         "Break Type": "Corporate Action - Stock Split", "Counterparty": "RBC IS",
-        "Tolerance Flag": "BREACH",
-        "Break Age (days)": random.randint(1, 5), "Bond Key": "",
-        "DESC": f"George Weston 3-for-1 split (completed Aug 2025). RBC Investor Services still "
-                f"reflecting pre-split position of {pre_qty:,} shares at ${old_price:.2f}. "
-                f"IBOR correctly updated to {post_qty:,} shares at ${live:.2f}."
+        "Tolerance Flag": "BREACH" if abs(mv_diff) > 3000 else "WITHIN",
+        "Break Age (days)": random.randint(0, 2), "Bond Key": "",
+        "DESC": f"Post 3-for-1 stock split (effective {split_date}). IBOR shows {post_qty:,} post-split "
+                f"shares; RBC IS records only {street_qty:,}. {post_qty - street_qty:,} share gap "
+                f"likely from fractional share truncation at sub-custodian level."
     }
 
 
 def _scenario_nflx_split(prices, today, t1, t2):
-    """NFLX — Netflix 10:1 stock split fractional share break (Nov 2025)"""
+    """NFLX — Netflix 10:1 stock split fractional share break"""
     live = prices["NFLX"]
-    pre_qty = random.choice([50, 100, 150, 200])
+    pre_qty = random.choice([100, 200, 500])
     post_qty = pre_qty * 10
-    frac = random.randint(1, 9)
-    street_qty = post_qty - frac
+    fractional_drop = random.randint(1, 5)
+    street_qty = post_qty - fractional_drop
     mv_int = round(post_qty * live, 2)
     mv_str = round(street_qty * live, 2)
     mv_diff = round(mv_int - mv_str, 2)
+    split_date = str(today - timedelta(days=random.randint(0, 1)))
     return {
         "Ticker": "NFLX", "Security Name": "Netflix Inc.",
         "CUSIP": "64110L106", "ISIN": "US64110L1061",
         "Instrument Type": "Equity", "Currency": "USD",
         "Internal Qty": post_qty, "Street Qty": street_qty,
-        "Qty Diff": frac,
+        "Qty Diff": fractional_drop,
         "Internal Price": live, "Street Price": live, "Price Diff %": "0.00%",
         "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
         "Settlement Date": str(today), "Trade Date": str(t1),
         "Break Type": "Corporate Action - Stock Split", "Counterparty": "DTC",
-        "Tolerance Flag": "WITHIN" if abs(mv_diff) < 2000 else "BREACH",
-        "Break Age (days)": random.randint(1, 3), "Bond Key": "",
-        "DESC": f"Netflix 10-for-1 split (Nov 2025). {frac} fractional share(s) pending cash-in-lieu "
-                f"processing at DTC. IBOR shows {post_qty:,} whole shares; DTC reports {street_qty:,}."
+        "Tolerance Flag": "WITHIN",
+        "Break Age (days)": random.randint(0, 1), "Bond Key": "",
+        "DESC": f"Netflix 10-for-1 stock split (effective {split_date}). {fractional_drop} fractional share(s) "
+                f"dropped by DTC during split processing. IBOR shows {post_qty:,} shares; DTC confirms "
+                f"{street_qty:,}. ${mv_diff:,.2f} impact — cash-in-lieu expected within T+3."
     }
 
 
@@ -201,6 +205,7 @@ def _scenario_bmo_dividend(prices, today, t1, t2):
     mv_int = round(qty * live, 2)
     mv_str = round(qty * (live - div_per_share), 2)
     mv_diff = round(mv_int - mv_str, 2)
+    ex_date = str(today - timedelta(days=random.randint(0, 1)))
     return {
         "Ticker": "BMO.TO", "Security Name": "Bank of Montreal",
         "CUSIP": "063671101", "ISIN": "CA0636711016",
@@ -212,24 +217,25 @@ def _scenario_bmo_dividend(prices, today, t1, t2):
         "Settlement Date": str(today), "Trade Date": str(t1),
         "Break Type": "Corporate Action - Dividend", "Counterparty": "CDS",
         "Tolerance Flag": "BREACH" if abs(mv_diff) > 5000 else "WITHIN",
-        "Break Age (days)": 1, "Bond Key": "",
-        "DESC": f"BMO Q1 2026 quarterly dividend (${div_per_share}/share, ex-date Feb 2026). "
+        "Break Age (days)": random.randint(0, 1), "Bond Key": "",
+        "DESC": f"BMO quarterly dividend (${div_per_share}/share, ex-date {ex_date}). "
                 f"CDS pricing reflects ex-dividend price but IBOR has not yet applied the ${div_total:,.2f} "
                 f"dividend receivable adjustment on {qty:,} shares."
     }
 
 
 def _scenario_na_dividend(prices, today, t1, t2):
-    """NA.TO — National Bank Q1 2026 dividend timing break"""
+    """NA.TO — National Bank dividend timing break"""
     live = prices["NA.TO"]
-    qty = random.choice([2000, 4000, 6000])
+    qty = random.choice([5000, 8000, 12000])
     div = 1.24
     mv_int = round(qty * live, 2)
     mv_str = round(qty * (live - div), 2)
     mv_diff = round(mv_int - mv_str, 2)
+    ex_date = str(today - timedelta(days=random.randint(0, 1)))
     return {
         "Ticker": "NA.TO", "Security Name": "National Bank of Canada",
-        "CUSIP": "633067103", "ISIN": "CA6330671034",
+        "CUSIP": "633067101", "ISIN": "CA6330671034",
         "Instrument Type": "Equity", "Currency": "CAD",
         "Internal Qty": qty, "Street Qty": qty, "Qty Diff": 0,
         "Internal Price": live, "Street Price": round(live - div, 2),
@@ -237,9 +243,9 @@ def _scenario_na_dividend(prices, today, t1, t2):
         "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
         "Settlement Date": str(today), "Trade Date": str(t1),
         "Break Type": "Corporate Action - Dividend", "Counterparty": "CDS",
-        "Tolerance Flag": "WITHIN" if abs(mv_diff) < 5000 else "BREACH",
-        "Break Age (days)": 1, "Bond Key": "",
-        "DESC": f"National Bank $1.24/share Q1 2026 dividend. Ex-date pricing mismatch — "
+        "Tolerance Flag": "BREACH" if abs(mv_diff) > 5000 else "WITHIN",
+        "Break Age (days)": random.randint(0, 1), "Bond Key": "",
+        "DESC": f"National Bank ${div}/share dividend. Ex-date pricing mismatch ({ex_date}) — "
                 f"street reflects post-ex price while IBOR values at cum-dividend level."
     }
 
@@ -276,22 +282,28 @@ def _scenario_aapl_settlement(prices, today, t1, t2):
     live = prices["AAPL"]
     qty = random.choice([2500, 5000, 7500])
     mv_int = round(qty * live, 2)
-    mv_str = 0
-    mv_diff = mv_int
+    # Timing differences: both sides agree on qty & price, only settlement date differs
+    # Small accrual-based MV diff from DvP timing
+    accrual = round(random.uniform(50, 2500), 2)
+    mv_str = round(mv_int - accrual, 2)
+    mv_diff = round(accrual, 2)
+    settle_int = str(today)
+    settle_str = str(today + timedelta(days=1))
     return {
         "Ticker": "AAPL", "Security Name": "Apple Inc.",
         "CUSIP": "037833100", "ISIN": "US0378331005",
         "Instrument Type": "Equity", "Currency": "USD",
-        "Internal Qty": qty, "Street Qty": 0, "Qty Diff": qty,
-        "Internal Price": live, "Street Price": None, "Price Diff %": None,
+        "Internal Qty": qty, "Street Qty": qty, "Qty Diff": 0,
+        "Internal Price": live, "Street Price": live, "Price Diff %": "0.00%",
         "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
-        "Settlement Date": str(today), "Trade Date": str(t1),
+        "Settlement Date": settle_int, "Trade Date": str(t1),
         "Break Type": "Timing Difference", "Counterparty": "DTC",
-        "Tolerance Flag": "BREACH",
+        "Tolerance Flag": "WITHIN",
         "Break Age (days)": 0, "Bond Key": "",
-        "DESC": f"Position ({qty:,} shares, ${mv_int:,.2f} MV) appears in IBOR but not yet in DTC "
-                f"participant account. Trade booked same-day at ${live:.2f}. T+1 settlement "
-                f"(SEC Rule, effective May 28, 2024) — DTC confirmation expected by EOD."
+        "DESC": f"Settlement date mismatch — internal books show {settle_int}, "
+                f"DTC confirms {settle_str}. T+1 rule applied. "
+                f"Quantities ({qty:,} shares) and pricing (${live:.2f}) reconcile clean. "
+                f"Minor accrual diff of ${accrual:,.2f} from DvP timing."
     }
 
 
@@ -439,6 +451,7 @@ def _scenario_ry_dividend(prices, today, t1, t2):
     mv_int = round(qty * live, 2)
     mv_str = round(qty * (live - div), 2)
     mv_diff = round(mv_int - mv_str, 2)
+    ex_date = str(today - timedelta(days=random.randint(0, 1)))
     return {
         "Ticker": "RY.TO", "Security Name": "Royal Bank of Canada",
         "CUSIP": "780087102", "ISIN": "CA7800871021",
@@ -450,8 +463,8 @@ def _scenario_ry_dividend(prices, today, t1, t2):
         "Settlement Date": str(today), "Trade Date": str(t1),
         "Break Type": "Corporate Action - Dividend", "Counterparty": "CDS",
         "Tolerance Flag": "BREACH" if abs(mv_diff) > 10000 else "WITHIN",
-        "Break Age (days)": 1, "Bond Key": "",
-        "DESC": f"Royal Bank $1.44/share Q1 2026 dividend ex-date mismatch. CDS shows "
+        "Break Age (days)": random.randint(0, 1), "Bond Key": "",
+        "DESC": f"Royal Bank ${div}/share dividend ex-date mismatch ({ex_date}). CDS shows "
                 f"post-ex price; IBOR at cum-dividend. ${abs(mv_diff):,.2f} variance on "
                 f"{qty:,} shares pending dividend receivable booking."
     }
@@ -465,6 +478,7 @@ def _scenario_cp_merger(prices, today, t1, t2):
     mv_int = round(qty * live, 2)
     mv_str = round(legacy_qty * live, 2)
     mv_diff = round(mv_int - mv_str, 2)
+    merger_date = str(today - timedelta(days=random.randint(1, 2)))
     return {
         "Ticker": "CP.TO", "Security Name": "Canadian Pacific Kansas City Ltd.",
         "CUSIP": "13646K108", "ISIN": "CA13646K1084",
@@ -476,21 +490,22 @@ def _scenario_cp_merger(prices, today, t1, t2):
         "Settlement Date": str(today), "Trade Date": str(t2),
         "Break Type": "Corporate Action - Merger", "Counterparty": "CDS",
         "Tolerance Flag": "BREACH",
-        "Break Age (days)": random.randint(2, 5), "Bond Key": "",
-        "DESC": f"Legacy KCS shares still reflecting in CDS position. IBOR updated to CPKC "
-                f"({qty:,} shares) but CDS depot shows {legacy_qty:,}. {abs(qty - legacy_qty):,} "
-                f"share discrepancy from merger exchange ratio rounding."
+        "Break Age (days)": random.randint(1, 2), "Bond Key": "",
+        "DESC": f"Legacy KCS shares still reflecting in CDS position (merger effective {merger_date}). "
+                f"IBOR updated to CPKC ({qty:,} shares) but CDS depot shows {legacy_qty:,}. "
+                f"{abs(qty - legacy_qty):,} share discrepancy from merger exchange ratio rounding."
     }
 
 
 def _scenario_hd_dividend(prices, today, t1, t2):
-    """HD — Home Depot Q1 2026 dividend increase break"""
+    """HD — Home Depot dividend increase break"""
     live = prices["HD"]
     qty = random.choice([1000, 2000, 3000])
     div = 2.30
     mv_int = round(qty * live, 2)
     mv_str = round(qty * (live - div), 2)
     mv_diff = round(mv_int - mv_str, 2)
+    ex_date = str(today - timedelta(days=random.randint(0, 1)))
     return {
         "Ticker": "HD", "Security Name": "The Home Depot Inc.",
         "CUSIP": "437076102", "ISIN": "US4370761029",
@@ -502,8 +517,8 @@ def _scenario_hd_dividend(prices, today, t1, t2):
         "Settlement Date": str(today), "Trade Date": str(t1),
         "Break Type": "Corporate Action - Dividend", "Counterparty": "DTC",
         "Tolerance Flag": "WITHIN" if abs(mv_diff) < 5000 else "BREACH",
-        "Break Age (days)": 1, "Bond Key": "",
-        "DESC": f"Home Depot increased quarterly dividend to $2.30/share (1.3% raise, Feb 2026). "
+        "Break Age (days)": random.randint(0, 1), "Bond Key": "",
+        "DESC": f"Home Depot increased quarterly dividend to ${div}/share (ex-date {ex_date}). "
                 f"DTC reflecting ex-dividend price; IBOR at cum-dividend. "
                 f"${abs(mv_diff):,.2f} variance pending accrual."
     }
@@ -536,27 +551,31 @@ def _scenario_panw_acq(prices, today, t1, t2):
 
 
 def _scenario_td_settlement(prices, today, t1, t2):
-    """TD.TO — Late settlement on block trade"""
+    """TD.TO — Settlement date mismatch timing break"""
     live = prices["TD.TO"]
     qty = random.choice([15000, 20000, 25000])
     mv_int = round(qty * live, 2)
-    partial = random.randint(5000, 10000)
-    mv_str = round(partial * live, 2)
-    mv_diff = round(mv_int - mv_str, 2)
+    # Timing difference: quantities and prices match, only settlement date differs
+    accrual = round(random.uniform(100, 2200), 2)
+    mv_str = round(mv_int - accrual, 2)
+    mv_diff = round(accrual, 2)
+    settle_int = str(today)
+    settle_str = str(today + timedelta(days=1))
     return {
         "Ticker": "TD.TO", "Security Name": "Toronto-Dominion Bank",
         "CUSIP": "891160509", "ISIN": "CA8911605092",
         "Instrument Type": "Equity", "Currency": "CAD",
-        "Internal Qty": qty, "Street Qty": partial, "Qty Diff": qty - partial,
+        "Internal Qty": qty, "Street Qty": qty, "Qty Diff": 0,
         "Internal Price": live, "Street Price": live, "Price Diff %": "0.00%",
         "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
-        "Settlement Date": str(today), "Trade Date": str(t2),
+        "Settlement Date": settle_int, "Trade Date": str(t2),
         "Break Type": "Timing Difference", "Counterparty": "CDS",
-        "Tolerance Flag": "BREACH",
-        "Break Age (days)": 2, "Bond Key": "",
-        "DESC": f"Block trade of {qty:,} TD shares partially settled. CDS confirms {partial:,} shares "
-                f"delivered; {qty - partial:,} pending. ${abs(mv_diff):,.2f} MV at risk. "
-                f"Counterparty may be short on borrow. Escalate to settlements desk."
+        "Tolerance Flag": "WITHIN",
+        "Break Age (days)": 1, "Bond Key": "",
+        "DESC": f"Settlement date mismatch — internal books show {settle_int}, "
+                f"CDS confirms {settle_str}. T+1 rule applied. "
+                f"Quantities ({qty:,} shares) and pricing (${live:.2f}) reconcile clean. "
+                f"Minor settlement date rounding diff of ${accrual:,.2f}."
     }
 
 
@@ -565,48 +584,221 @@ def _scenario_goog_settlement(prices, today, t1, t2):
     live = prices["GOOG"]
     qty = random.choice([1000, 2000, 3000])
     mv_int = round(qty * live, 2)
-    mv_str = 0
-    mv_diff = mv_int
+    # Timing difference: both sides agree, only settlement date differs
+    accrual = round(random.uniform(200, 2500), 2)
+    mv_str = round(mv_int - accrual, 2)
+    mv_diff = round(accrual, 2)
+    settle_int = str(today)
+    settle_str = str(today + timedelta(days=1))
     return {
         "Ticker": "GOOG", "Security Name": "Alphabet Inc. Class C",
         "CUSIP": "02079K107", "ISIN": "US02079K1079",
         "Instrument Type": "Equity", "Currency": "USD",
-        "Internal Qty": qty, "Street Qty": 0, "Qty Diff": qty,
-        "Internal Price": live, "Street Price": None, "Price Diff %": None,
+        "Internal Qty": qty, "Street Qty": qty, "Qty Diff": 0,
+        "Internal Price": live, "Street Price": live, "Price Diff %": "0.00%",
         "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
-        "Settlement Date": str(today), "Trade Date": str(t1),
+        "Settlement Date": settle_int, "Trade Date": str(t1),
         "Break Type": "Timing Difference", "Counterparty": "DTC",
-        "Tolerance Flag": "BREACH",
+        "Tolerance Flag": "WITHIN",
         "Break Age (days)": 0, "Bond Key": "",
-        "DESC": f"Cross-border purchase of {qty:,} GOOG shares (${mv_int:,.2f}) booked in IBOR "
-                f"but awaiting DTC settlement. FX conversion delay from CAD funding account. "
-                f"Expected DTC confirmation within T+1."
+        "DESC": f"Settlement date mismatch — internal books show {settle_int}, "
+                f"DTC confirms {settle_str}. Cross-border T+1 rule applied. "
+                f"Quantities ({qty:,} shares) and pricing (${live:.2f}) reconcile clean. "
+                f"Minor FX conversion accrual diff of ${accrual:,.2f}."
     }
 
 
-# All scenarios
-ALL_SCENARIOS = [
-    _scenario_shop_pricing,
-    _scenario_cnr_qty,
-    _scenario_loblaw_split,
-    _scenario_weston_split,
-    _scenario_nflx_split,
-    _scenario_bmo_dividend,
-    _scenario_na_dividend,
-    _scenario_nvda_pricing,
-    _scenario_aapl_settlement,
-    _scenario_xiu_nav,
-    _scenario_enb_fx,
-    _scenario_tsla_pricing,
-    _scenario_vfv_rebalance,
-    _scenario_meta_pricing,
-    _scenario_ry_dividend,
-    _scenario_cp_merger,
-    _scenario_hd_dividend,
-    _scenario_panw_acq,
-    _scenario_td_settlement,
-    _scenario_goog_settlement,
-]
+# ── FIXED INCOME SCENARIOS ──
+
+def _scenario_ust_10y(prices, today, t1, t2):
+    """US Treasury 10Y — Clean vs dirty price accrued interest break"""
+    face = random.choice([5_000_000, 10_000_000, 25_000_000])
+    coupon = 4.25
+    clean = round(random.uniform(97.5, 102.0), 6)
+    days_accrued = random.randint(30, 90)
+    accrued_interest = round(face * (coupon / 100) * (days_accrued / 365), 2)
+    dirty = round(clean + (coupon / 100) * (days_accrued / 365) * 100, 6)
+    mv_int = round(face * dirty / 100, 2)
+    mv_str = round(face * clean / 100, 2)
+    mv_diff = round(mv_int - mv_str, 2)
+    return {
+        "Ticker": "912810TW2", "Security Name": "US Treasury 4.25% 02/15/2034",
+        "CUSIP": "912810TW2", "ISIN": "US912810TW26",
+        "Instrument Type": "Fixed Income", "Currency": "USD",
+        "Internal Qty": face, "Street Qty": face, "Qty Diff": 0,
+        "Internal Price": dirty, "Street Price": clean,
+        "Price Diff %": f"{round((dirty - clean) / clean * 100, 3)}%",
+        "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
+        "Settlement Date": str(today), "Trade Date": str(t1),
+        "Break Type": "Pricing Difference", "Counterparty": "Fed Wire",
+        "Tolerance Flag": "BREACH" if abs(mv_diff) > 50000 else "WITHIN",
+        "Break Age (days)": 1, "Bond Key": "UST-10Y-2034",
+        "DESC": f"IBOR pricing at dirty price ({dirty:.4f}) includes ${accrued_interest:,.2f} accrued interest "
+                f"({days_accrued} days, {coupon}% coupon). Fedwire clearing at clean price ({clean:.4f}). "
+                f"${abs(mv_diff):,.2f} variance on ${face:,.0f} face value. Standard T+1 settlement."
+    }
+
+
+def _scenario_canada_govt_bond(prices, today, t1, t2):
+    """Canada Govt Bond 3.5% — Yield curve reprice break"""
+    face = random.choice([2_000_000, 5_000_000, 10_000_000])
+    int_price = round(random.uniform(98.0, 101.0), 6)
+    street_price = round(int_price - random.uniform(0.15, 0.45), 6)
+    mv_int = round(face * int_price / 100, 2)
+    mv_str = round(face * street_price / 100, 2)
+    mv_diff = round(mv_int - mv_str, 2)
+    return {
+        "Ticker": "CAN 3.5 06/26", "Security Name": "Canada Govt Bond 3.5% Jun 2026",
+        "CUSIP": "135087P44", "ISIN": "CA135087P443",
+        "Instrument Type": "Fixed Income", "Currency": "CAD",
+        "Internal Qty": face, "Street Qty": face, "Qty Diff": 0,
+        "Internal Price": int_price, "Street Price": street_price,
+        "Price Diff %": f"{round((int_price - street_price) / street_price * 100, 3)}%",
+        "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
+        "Settlement Date": str(today), "Trade Date": str(t1),
+        "Break Type": "Pricing Difference", "Counterparty": "CDS",
+        "Tolerance Flag": "BREACH" if abs(mv_diff) > 25000 else "WITHIN",
+        "Break Age (days)": 1, "Bond Key": "CAN-3.5-2026",
+        "DESC": f"Canadian government bond pricing divergence. IBOR mark ({int_price:.4f}) vs CDS settlement "
+                f"price ({street_price:.4f}). Likely BoC rate decision impact on yield curve not yet reflected "
+                f"in vendor feed. ${abs(mv_diff):,.2f} variance on ${face:,.0f} face."
+    }
+
+
+# ── FX SCENARIOS ──
+
+def _scenario_usdcad_spot(prices, today, t1, t2):
+    """USD/CAD — Spot FX rate cutoff timing break"""
+    notional_usd = random.choice([2_000_000, 5_000_000, 10_000_000])
+    int_rate = round(random.uniform(1.3520, 1.3620), 4)
+    street_rate = round(int_rate - random.uniform(0.0020, 0.0060), 4)
+    mv_int = round(notional_usd * int_rate, 2)
+    mv_str = round(notional_usd * street_rate, 2)
+    mv_diff = round(mv_int - mv_str, 2)
+    return {
+        "Ticker": "USD/CAD", "Security Name": "USD/CAD Spot",
+        "CUSIP": "", "ISIN": "",
+        "Instrument Type": "FX", "Currency": "CAD",
+        "Internal Qty": notional_usd, "Street Qty": notional_usd, "Qty Diff": 0,
+        "Internal Price": int_rate, "Street Price": street_rate,
+        "Price Diff %": f"{round((int_rate - street_rate) / street_rate * 100, 3)}%",
+        "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
+        "Settlement Date": str(today + timedelta(days=2)), "Trade Date": str(today),
+        "Break Type": "FX Rate Difference", "Counterparty": "CLS Bank",
+        "Tolerance Flag": "BREACH" if abs(mv_diff) > 10000 else "WITHIN",
+        "Break Age (days)": 0, "Bond Key": "",
+        "DESC": f"USD/CAD spot trade. IBOR rate ({int_rate}) taken at 16:00 WMR London fix vs "
+                f"CLS Bank settlement rate ({street_rate}) at 12:00 noon fix. "
+                f"${abs(mv_diff):,.2f} variance on ${notional_usd:,.0f} notional. T+2 settlement."
+    }
+
+
+def _scenario_eurusd_forward(prices, today, t1, t2):
+    """EUR/USD — 3-month FX forward mark-to-market break"""
+    notional_eur = random.choice([3_000_000, 7_000_000, 15_000_000])
+    fwd_rate = round(random.uniform(1.0820, 1.0920), 4)
+    mtm_rate = round(fwd_rate + random.uniform(0.0015, 0.0045), 4)
+    mv_int = round(notional_eur * mtm_rate, 2)
+    mv_str = round(notional_eur * fwd_rate, 2)
+    mv_diff = round(mv_int - mv_str, 2)
+    maturity = today + timedelta(days=90)
+    return {
+        "Ticker": "EUR/USD 3M", "Security Name": "EUR/USD 3-Month Forward",
+        "CUSIP": "", "ISIN": "",
+        "Instrument Type": "FX", "Currency": "USD",
+        "Internal Qty": notional_eur, "Street Qty": notional_eur, "Qty Diff": 0,
+        "Internal Price": mtm_rate, "Street Price": fwd_rate,
+        "Price Diff %": f"{round((mtm_rate - fwd_rate) / fwd_rate * 100, 3)}%",
+        "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
+        "Settlement Date": str(maturity), "Trade Date": str(today),
+        "Break Type": "FX Rate Difference", "Counterparty": "Deutsche Bank",
+        "Tolerance Flag": "BREACH" if abs(mv_diff) > 20000 else "WITHIN",
+        "Break Age (days)": 0, "Bond Key": "",
+        "DESC": f"EUR/USD 3-month forward contract (maturity {maturity}). IBOR MTM rate ({mtm_rate}) "
+                f"vs counterparty valuation ({fwd_rate}). Forward points divergence likely due to "
+                f"ECB rate differential update. ${abs(mv_diff):,.2f} on €{notional_eur:,.0f} notional."
+    }
+
+
+# ── DERIVATIVE SCENARIOS ──
+
+def _scenario_sp500_future(prices, today, t1, t2):
+    """ES — S&P 500 E-mini future margin/variation break"""
+    contracts = random.choice([10, 25, 50, 100])
+    multiplier = 50  # ES contract multiplier
+    int_price = round(random.uniform(5950, 6100), 2)
+    street_price = round(int_price - random.uniform(5, 20), 2)
+    notional = contracts * multiplier
+    mv_int = round(notional * int_price, 2)
+    mv_str = round(notional * street_price, 2)
+    mv_diff = round(mv_int - mv_str, 2)
+    return {
+        "Ticker": "ESH26", "Security Name": "S&P 500 E-mini Future Mar 2026",
+        "CUSIP": "", "ISIN": "",
+        "Instrument Type": "Derivative", "Currency": "USD",
+        "Internal Qty": contracts, "Street Qty": contracts, "Qty Diff": 0,
+        "Internal Price": int_price, "Street Price": street_price,
+        "Price Diff %": f"{round((int_price - street_price) / street_price * 100, 3)}%",
+        "MV Internal ($)": mv_int, "MV Street ($)": mv_str, "MV Diff ($)": mv_diff,
+        "Settlement Date": str(today), "Trade Date": str(t1),
+        "Break Type": "Pricing Difference", "Counterparty": "CME Clearing",
+        "Tolerance Flag": "BREACH" if abs(mv_diff) > 25000 else "WITHIN",
+        "Break Age (days)": 1, "Bond Key": "",
+        "DESC": f"S&P 500 E-mini futures ({contracts} contracts × $50 multiplier). IBOR settlement "
+                f"price ({int_price:.2f}) vs CME daily settlement ({street_price:.2f}). Variation margin "
+                f"discrepancy of ${abs(mv_diff):,.2f}. CME final settlement published at 16:00 CT."
+    }
+
+
+def _scenario_irs_mtm(prices, today, t1, t2):
+    """IRS — Interest rate swap mark-to-market valuation break"""
+    notional = random.choice([10_000_000, 25_000_000, 50_000_000])
+    fixed_rate = round(random.uniform(3.80, 4.30), 4)
+    int_mtm = round(random.uniform(-150000, 150000), 2)
+    street_mtm = round(int_mtm + random.uniform(-25000, -5000), 2)
+    mv_diff = round(int_mtm - street_mtm, 2)
+    return {
+        "Ticker": "IRS-5Y-USD", "Security Name": f"USD 5Y IRS {fixed_rate}% vs SOFR",
+        "CUSIP": "", "ISIN": "",
+        "Instrument Type": "Derivative", "Currency": "USD",
+        "Internal Qty": notional, "Street Qty": notional, "Qty Diff": 0,
+        "Internal Price": round(int_mtm / notional * 100, 6),
+        "Street Price": round(street_mtm / notional * 100, 6),
+        "Price Diff %": f"{round(mv_diff / abs(notional) * 100, 3)}%",
+        "MV Internal ($)": int_mtm, "MV Street ($)": street_mtm, "MV Diff ($)": mv_diff,
+        "Settlement Date": str(today), "Trade Date": str(today - timedelta(days=365)),
+        "Break Type": "Pricing Difference", "Counterparty": "LCH Clearnet",
+        "Tolerance Flag": "BREACH" if abs(mv_diff) > 15000 else "WITHIN",
+        "Break Age (days)": 1, "Bond Key": "",
+        "DESC": f"5-year USD interest rate swap ({fixed_rate}% fixed vs SOFR float) on "
+                f"${notional:,.0f} notional. IBOR MTM (${int_mtm:,.2f}) vs LCH valuation "
+                f"(${street_mtm:,.2f}). Curve input divergence — IBOR using SOFR term rate vs "
+                f"LCH using overnight compounded SOFR. ${abs(mv_diff):,.2f} variance."
+    }
+
+
+# ─────────────────────────────────────────
+# SCENARIO POOL — tagged by instrument type for guaranteed diversity
+# ─────────────────────────────────────────
+
+SCENARIOS_BY_TYPE = {
+    "Equity": [
+        _scenario_shop_pricing, _scenario_cnr_qty,
+        _scenario_nvda_pricing, _scenario_tsla_pricing, _scenario_meta_pricing,
+        _scenario_aapl_settlement, _scenario_td_settlement, _scenario_goog_settlement,
+    ],
+    "Corporate Action": [
+        _scenario_loblaw_split, _scenario_weston_split, _scenario_nflx_split,
+        _scenario_bmo_dividend, _scenario_na_dividend, _scenario_ry_dividend,
+        _scenario_cp_merger, _scenario_hd_dividend, _scenario_panw_acq,
+    ],
+    "ETF": [_scenario_xiu_nav, _scenario_vfv_rebalance],
+    "FX": [_scenario_enb_fx, _scenario_usdcad_spot, _scenario_eurusd_forward],
+    "Fixed Income": [_scenario_ust_10y, _scenario_canada_govt_bond],
+    "Derivative": [_scenario_sp500_future, _scenario_irs_mtm],
+}
+
+ALL_SCENARIOS = [fn for fns in SCENARIOS_BY_TYPE.values() for fn in fns]
 
 
 # ─────────────────────────────────────────
@@ -630,9 +822,16 @@ def generate_sample_breaks():
         prices[ticker] = price
         print(f"  {ticker}: ${price:.2f} ({source})")
 
-    # Randomly select 7-12 scenarios
-    num_scenarios = random.randint(7, min(12, len(ALL_SCENARIOS)))
-    selected_scenarios = random.sample(ALL_SCENARIOS, num_scenarios)
+    # Guarantee at least 1 of each type
+    guaranteed = []
+    for type_name, type_scenarios in SCENARIOS_BY_TYPE.items():
+        guaranteed.append(random.choice(type_scenarios))
+
+    # Fill remaining slots with random picks (avoiding duplicates)
+    remaining_pool = [s for s in ALL_SCENARIOS if s not in guaranteed]
+    extra_count = random.randint(4, min(8, len(remaining_pool)))
+    extras = random.sample(remaining_pool, extra_count)
+    selected_scenarios = guaranteed + extras
 
     breaks = []
     for scenario_fn in selected_scenarios:
@@ -664,8 +863,10 @@ def generate_sample_breaks():
     output_path = Path(__file__).parent / "sample_breaks.xlsx"
     df.to_excel(output_path, index=False, sheet_name="Breaks")
     print(f"\n✅ Generated {len(breaks)} breaks → {output_path}")
+    print(f"   Types: {', '.join(set(b.get('Instrument Type','?') for b in breaks))}")
     return str(output_path)
 
 
 if __name__ == "__main__":
     generate_sample_breaks()
+

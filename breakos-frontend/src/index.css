@@ -5,40 +5,40 @@
 @tailwind utilities;
 
 /* ══════════════════════════════════════════
-   WEALTHSIMPLE DESIGN SYSTEM — TRUE PALETTE
-   Extracted from actual Wealthsimple web app
+   MODERN BROKERAGE DESIGN SYSTEM — TRUE PALETTE
+   Clean, institutional aesthetic
    ══════════════════════════════════════════ */
 
 :root {
   /* DARK MODE (default) — true black, monochromatic */
   --bg: #0a0a09;
   --bg-subtle: #111110;
-  --surface: #1c1c1a;
-  --surface-raised: #242422;
-  --surface-overlay: #2c2c29;
-  --border: #2e2e2b;
-  --border-subtle: #1e1e1c;
+  --surface: #181816;
+  --surface-raised: #20201d;
+  --surface-overlay: #282825;
+  --border: #2a2a27;
+  --border-subtle: #1c1c1a;
 
   /* Primary accent — clean white, not neon */
   --accent: #f5f5f3;
   --accent-dim: #d4d4d0;
-  --accent-muted: rgba(245, 245, 243, 0.06);
+  --accent-muted: rgba(245, 245, 243, 0.08);
   --accent-text: #0a0a09;
 
   /* Semantic colors */
-  --red: #ff453a;
-  --red-muted: rgba(255, 69, 58, 0.10);
+  --red: #ff3b30;
+  --red-muted: rgba(255, 59, 48, 0.12);
   --amber: #ff9f0a;
-  --amber-muted: rgba(255, 159, 10, 0.10);
+  --amber-muted: rgba(255, 159, 10, 0.12);
   --blue: #0a84ff;
-  --blue-muted: rgba(10, 132, 255, 0.10);
-  --green: #32d74b;
-  --green-muted: rgba(50, 215, 75, 0.10);
+  --blue-muted: rgba(10, 132, 255, 0.12);
+  --green: #30d158;
+  --green-muted: rgba(48, 209, 88, 0.12);
 
   /* Text */
   --text-primary: #f2f2ed;
-  --text-secondary: #8a8a82;
-  --text-muted: #505048;
+  --text-secondary: #909088;
+  --text-muted: #5e5e56;
   --text-inverse: #0a0a09;
 
   /* Navigation */
@@ -47,14 +47,14 @@
 
   /* Sidebar */
   --sidebar-bg: #0a0a09;
-  --sidebar-active: #1c1c1a;
+  --sidebar-active: #181816;
 
   /* Typography */
   --text-xs: 11px;
-  --text-sm: 12px;
-  --text-base: 14px;
-  --text-md: 16px;
-  --text-lg: 20px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 21px;
   --text-xl: 28px;
   --text-2xl: 40px;
 
@@ -71,44 +71,44 @@
 
   /* Animations */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 [data-theme="light"] {
-  /* LIGHT MODE — warm off-white like Wealthsimple */
-  --bg: #f2efe8;
-  --bg-subtle: #ebe8e1;
+  /* LIGHT MODE — warm off-white */
+  --bg: #f7f5f0;
+  --bg-subtle: #f0eee8;
   --surface: #ffffff;
-  --surface-raised: #fafaf8;
-  --surface-overlay: #f5f2eb;
-  --border: #e8e5de;
-  --border-subtle: #f0ede6;
+  --surface-raised: #fcfcfb;
+  --surface-overlay: #f5f4f0;
+  --border: #e6e4de;
+  --border-subtle: #efedeb;
 
-  --accent: #1a1a18;
-  --accent-dim: #333330;
-  --accent-muted: rgba(26, 26, 24, 0.06);
+  --accent: #111110;
+  --accent-dim: #3a3a38;
+  --accent-muted: rgba(17, 17, 16, 0.05);
   --accent-text: #ffffff;
 
-  --red: #cc2200;
-  --red-muted: rgba(204, 34, 0, 0.08);
+  --red: #d70015;
+  --red-muted: rgba(215, 0, 21, 0.08);
   --amber: #b86800;
   --amber-muted: rgba(184, 104, 0, 0.08);
   --blue: #0055cc;
   --blue-muted: rgba(0, 85, 204, 0.08);
-  --green: #1a7a30;
-  --green-muted: rgba(26, 122, 48, 0.08);
+  --green: #248a3d;
+  --green-muted: rgba(36, 138, 61, 0.08);
 
-  --text-primary: #1a1a18;
-  --text-secondary: #5a5a52;
-  --text-muted: #9a9a90;
+  --text-primary: #111110;
+  --text-secondary: #6e6e66;
+  --text-muted: #9a9a92;
   --text-inverse: #ffffff;
 
   --nav-bg: #ffffff;
   --nav-border: #ece9e2;
 
-  --sidebar-bg: #ffffff;
-  --sidebar-active: #f5f2eb;
+  --sidebar-bg: #ece9e2;
+  --sidebar-active: #ffffff;
 }
 
 /* ══════════════════════════════════════════
@@ -119,14 +119,22 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--bg);
   color: var(--text-primary);
-  transition: background-color 0.3s var(--ease-smooth), color 0.3s var(--ease-smooth);
+  transition: background-color 0.4s var(--ease-smooth), color 0.4s var(--ease-smooth);
   margin: 0;
   padding: 0;
   overflow: hidden;
-  zoom: 1.10;
-  /* Scales up all pixel-perfect sizes and fonts uniformly */
+  height: 100vh;
+  width: 100vw;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+}
+
+#root {
+  zoom: 0.92;
+  height: calc(100vh / 0.92);
+  width: calc(100vw / 0.92);
+  overflow: hidden;
 }
 
 * {
@@ -136,8 +144,8 @@ body {
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
