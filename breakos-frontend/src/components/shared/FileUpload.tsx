@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Upload, FileSpreadsheet, Check } from 'lucide-react';
+import { Upload, FileSpreadsheet, Check, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { uploadFile, loadSampleReport } from '../../lib/api';
@@ -7,19 +7,22 @@ import { useStore } from '../../store';
 
 export function FileUpload() {
     const { setBreaks } = useStore();
-    const [status, setStatus] = useState<'idle' | 'processing' | 'done'>('idle');
+    const [status, setStatus] = useState<'idle' | 'processing' | 'done' | 'error'>('idle');
     const [dragOver, setDragOver] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string>('');
 
     const handleFile = useCallback(async (file: File) => {
         setStatus('processing');
+        setErrorMsg('');
         try {
             const result = await uploadFile(file);
             setBreaks(result.breaks);
             setStatus('done');
             setTimeout(() => setStatus('idle'), 2500);
-        } catch (err) {
+        } catch (err: any) {
             console.error('Upload failed:', err);
-            setStatus('idle');
+            setErrorMsg(err.message || 'An unknown error occurred during upload.');
+            setStatus('error');
         }
     }, [setBreaks]);
 
@@ -55,6 +58,26 @@ export function FileUpload() {
                     <Check size={18} className="text-[var(--green)]" strokeWidth={2.5} />
                 </div>
                 <span className="text-[15px] font-medium text-[var(--text-primary)] tracking-tight">Break report loaded successfully. Analysis ready.</span>
+            </motion.div>
+        );
+    }
+
+    if (status === 'error') {
+        return (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.4 }} className="w-full bg-[#3e1b1b]/20 border border-[#f05252]/30 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-center gap-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                <div className="w-8 h-8 rounded-full bg-[#f05252]/10 flex items-center justify-center flex-shrink-0">
+                    <AlertCircle size={18} className="text-[#f05252]" strokeWidth={2.5} />
+                </div>
+                <div className="flex flex-col items-center sm:items-start flex-1 min-w-0">
+                    <span className="text-[15px] font-semibold text-[#f05252] tracking-tight mb-0.5">Upload Failed</span>
+                    <span className="text-[13px] font-medium text-[#f05252]/80 text-center sm:text-left break-words w-full">{errorMsg}</span>
+                </div>
+                <button
+                    onClick={() => setStatus('idle')}
+                    className="flex-shrink-0 px-4 py-2 mt-2 sm:mt-0 rounded-xl bg-[#f05252]/10 hover:bg-[#f05252]/20 text-[#f05252] text-[13px] font-semibold transition-colors border border-[#f05252]/20 whitespace-nowrap"
+                >
+                    Try Again
+                </button>
             </motion.div>
         );
     }

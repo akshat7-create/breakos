@@ -80,7 +80,10 @@ export async function uploadFile(file: File): Promise<{ breaks: BreakRecord[]; t
     const formData = new FormData();
     formData.append('file', file);
     const res = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
-    if (!res.ok) throw new Error('Upload failed');
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.detail || 'Upload failed');
+    }
     return res.json();
 }
 
