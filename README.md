@@ -58,6 +58,20 @@ npm run dev
 
 ---
 
+## Data Sources & Integrations
+BreakOS is built to interpret the same data a human analyst would use. It integrates with real-world financial data APIs to contextualize and resolve breaks:
+
+| Data Source | What It Provides | How BreakOS Uses It |
+|-------------|------------------|----------------------|
+| **Yahoo Finance (`yfinance`)** | Live market prices, historical close prices, trade volumes | To calculate precise Dollar Value (MV) differences on pricing breaks and identify if a stale vendor price is the root cause. |
+| **Corporate Actions (via Yahoo)** | Ex-dates, dividends, stock splits | To automatically detect if a quantity or MV break is actually an unbooked dividend or a pending stock split. |
+| **SEC EDGAR Filings** | 8-K statements, merger announcements | To provide deterministic proof for complex corporate actions (e.g., acquisitions, ticker changes) that cause security mismatches. |
+| **`rateslib`** | Fixed income analytics & accrued interest | To calculate precise Act/360 or 30/360 interest accruals for bond breaks. |
+| **Depository Settlement Rules** | CDS (Canada) & DTC (US) logic | Hardcoded logic to simulate T+1 settlement cycles and flag when a "break" is actually just a trade that hasn't settled yet based on the trade date. |
+| **Counterparty Intelligence** | Simulated participant data | Mimics typical behavior patterns of major custodians (e.g., RBC IS missing late-day sweeps, State Street batch delays) to inform AI confidence scores. |
+
+---
+
 ## Technology Stack
 - **Frontend**: React, TypeScript, Tailwind CSS, Framer Motion, Zustand
 - **Backend**: FastAPI, Python
