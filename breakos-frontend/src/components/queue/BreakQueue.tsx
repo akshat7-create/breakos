@@ -34,7 +34,7 @@ export function BreakQueue() {
     };
 
     return (
-        <div className="w-[340px] flex-shrink-0 border-r border-[var(--border-subtle)] bg-[var(--bg)] flex flex-col h-full">
+        <div className="w-full lg:w-[340px] flex-shrink-0 border-r border-[var(--border-subtle)] bg-[var(--bg)] flex flex-col h-full overflow-hidden">
             <div className="px-5 pt-5 pb-3 flex-shrink-0">
                 <div className="flex justify-between items-center mb-5">
                     <div>
@@ -70,7 +70,7 @@ export function BreakQueue() {
 
             {/* Severity Filter */}
             <div className="px-5 py-2.5 flex-shrink-0">
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     {severityFilters.map(tab => (
                         <button
                             key={tab}

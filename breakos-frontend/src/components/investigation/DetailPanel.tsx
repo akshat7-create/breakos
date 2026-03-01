@@ -41,20 +41,20 @@ export function DetailPanel() {
                 key={selectedBreak.id}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-[var(--surface)] border border-[var(--border-subtle)] p-5 rounded-3xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-4"
+                className="bg-[var(--surface)] border border-[var(--border-subtle)] p-4 lg:p-5 rounded-3xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col gap-4"
             >
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-0">
                     <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2.5">
-                            <h2 className="text-[20px] font-bold text-[var(--text-primary)] tracking-tight">
+                        <div className="flex items-center flex-wrap gap-2 sm:gap-2.5">
+                            <h2 className="text-[18px] lg:text-[20px] font-bold text-[var(--text-primary)] tracking-tight">
                                 {selectedBreak.ticker}
                             </h2>
-                            <span className="text-[var(--text-muted)] text-[18px] opacity-60">·</span>
-                            <h3 className="text-[17px] font-medium text-[var(--text-secondary)]">
+                            <span className="text-[var(--text-muted)] text-[16px] lg:text-[18px] opacity-60">·</span>
+                            <h3 className="text-[15px] lg:text-[17px] font-medium text-[var(--text-secondary)]">
                                 {selectedBreak.instrument}
                             </h3>
                             <span className={cn(
-                                "ml-1.5 px-2 py-1 rounded border text-[9px] font-bold uppercase tracking-widest",
+                                "ml-0 sm:ml-1.5 px-2 py-1 rounded border text-[9px] font-bold uppercase tracking-widest",
                                 selectedBreak.severity === 'HIGH' ? "bg-[var(--red-muted)] text-[var(--red)] border-[var(--red-muted)]" :
                                     selectedBreak.severity === 'MEDIUM' ? "bg-[var(--amber-muted)] text-[var(--amber)] border-[var(--amber-muted)]" :
                                         "bg-[var(--blue-muted)] text-[var(--blue)] border-[var(--blue-muted)]"
@@ -62,17 +62,17 @@ export function DetailPanel() {
                                 {selectedBreak.severity}
                             </span>
                         </div>
-                        <div className="text-[12px] text-[var(--text-secondary)] font-medium flex items-center gap-2.5">
+                        <div className="text-[11px] lg:text-[12px] text-[var(--text-secondary)] font-medium flex items-center flex-wrap gap-2 lg:gap-2.5">
                             <span className="text-[var(--text-primary)] font-semibold">{selectedBreak.transactionType || '—'}</span>
-                            <span className="w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-40" />
+                            <span className="hidden sm:block w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-40" />
                             <span>{selectedBreak.instrumentType}</span>
-                            <span className="w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-40" />
+                            <span className="hidden sm:block w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-40" />
                             <span>{selectedBreak.currency}</span>
-                            <span className="w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-40" />
+                            <span className="hidden sm:block w-1 h-1 rounded-full bg-[var(--text-muted)] opacity-40" />
                             <span className="truncate max-w-[140px]">{selectedBreak.counterparty}</span>
                         </div>
                     </div>
-                    <div className="flex flex-col items-end gap-1 text-right flex-shrink-0">
+                    <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start w-full sm:w-auto gap-1 text-right flex-shrink-0">
                         <span className="text-[12px] text-[var(--text-muted)] font-mono">{selectedBreak.refId}</span>
                         {selectedBreak.age !== undefined && (
                             <span className="text-[13px] font-medium text-[var(--text-secondary)]">{selectedBreak.age}d old</span>
@@ -82,7 +82,7 @@ export function DetailPanel() {
 
                 <div className="border-t border-[var(--border-subtle)]" />
 
-                <div className="grid grid-cols-4 grid-rows-2 gap-y-3 gap-x-4 py-2">
+                <div className="grid grid-cols-2 md:grid-cols-4 grid-rows-4 md:grid-rows-2 gap-y-3 gap-x-4 py-2">
                     <Cell label="Internal Qty" value={selectedBreak.internalQty?.toLocaleString() || '—'} />
                     <Cell label="Street Qty" value={selectedBreak.streetQty?.toLocaleString() || '—'} />
                     <Cell label="Trade Date" value={selectedBreak.tradeDate || '—'} />

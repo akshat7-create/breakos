@@ -97,9 +97,9 @@ export function OverviewView() {
                     <motion.div
                         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
                         transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
-                        className="bg-[var(--surface)] rounded-3xl border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-7"
+                        className="bg-[var(--surface)] rounded-3xl border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] p-5 lg:p-7"
                     >
-                        <div className="flex items-stretch gap-8">
+                        <div className="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-8">
                             {/* Left: MV Variance Hero */}
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-4">
@@ -108,7 +108,7 @@ export function OverviewView() {
                                     </div>
                                     <span className="text-[11px] uppercase font-bold tracking-[0.12em] text-[var(--text-muted)]">Total MV Exposure</span>
                                 </div>
-                                <p className="text-[40px] font-semibold text-[var(--text-primary)] tracking-tight leading-none mb-2 font-tabular">
+                                <p className="text-[32px] lg:text-[40px] font-semibold text-[var(--text-primary)] tracking-tight leading-none mb-2 font-tabular">
                                     ${totalMvDiff.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                                 </p>
                                 <p className="text-[13px] text-[var(--text-muted)] font-medium">
@@ -120,28 +120,29 @@ export function OverviewView() {
                             </div>
 
                             {/* Divider */}
-                            <div className="w-px bg-[var(--border-subtle)]" />
+                            <div className="hidden lg:block w-px bg-[var(--border-subtle)]" />
+                            <div className="block lg:hidden h-px w-full bg-[var(--border-subtle)]" />
 
                             {/* Right: Key Metrics Grid */}
-                            <div className="grid grid-cols-4 gap-6 flex-1">
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 flex-1">
                                 <div className="flex flex-col justify-center">
                                     <span className="text-[11px] uppercase text-[var(--text-muted)] tracking-[0.1em] font-semibold mb-2">Total</span>
-                                    <span className="text-[28px] font-semibold text-[var(--text-primary)] font-tabular leading-none">{total}</span>
+                                    <span className="text-[24px] lg:text-[28px] font-semibold text-[var(--text-primary)] font-tabular leading-none">{total}</span>
                                     <span className="text-[11px] text-[var(--text-muted)] mt-1">breaks</span>
                                 </div>
                                 <div className="flex flex-col justify-center">
                                     <span className="text-[11px] uppercase text-[var(--text-muted)] tracking-[0.1em] font-semibold mb-2">High</span>
-                                    <span className="text-[28px] font-semibold text-[var(--red)] font-tabular leading-none">{high}</span>
+                                    <span className="text-[24px] lg:text-[28px] font-semibold text-[var(--red)] font-tabular leading-none">{high}</span>
                                     <span className="text-[11px] text-[var(--text-muted)] mt-1">breaks</span>
                                 </div>
                                 <div className="flex flex-col justify-center">
                                     <span className="text-[11px] uppercase text-[var(--text-muted)] tracking-[0.1em] font-semibold mb-2">Triaged</span>
-                                    <span className="text-[28px] font-semibold text-[var(--accent-dim)] font-tabular leading-none">{triaged}/{total}</span>
+                                    <span className="text-[24px] lg:text-[28px] font-semibold text-[var(--accent-dim)] font-tabular leading-none">{triaged}/{total}</span>
                                     <span className="text-[11px] text-[var(--text-muted)] mt-1">of {total}</span>
                                 </div>
                                 <div className="flex flex-col justify-center">
                                     <span className="text-[11px] uppercase text-[var(--text-muted)] tracking-[0.1em] font-semibold mb-2">Investigated</span>
-                                    <span className="text-[28px] font-semibold text-[var(--green)] font-tabular leading-none">{investigated}</span>
+                                    <span className="text-[24px] lg:text-[28px] font-semibold text-[var(--green)] font-tabular leading-none">{investigated}</span>
                                     <span className="text-[11px] text-[var(--text-muted)] mt-1">breaks</span>
                                 </div>
                             </div>
@@ -149,19 +150,19 @@ export function OverviewView() {
                     </motion.div>
 
                     {/* ═══ MIDDLE ROW: Severity Ring + Break Types ═══ */}
-                    <div className="grid grid-cols-5 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                         {/* Severity Ring */}
                         <motion.div
                             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.05, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
-                            className="col-span-2 bg-[var(--surface)] rounded-3xl p-7 border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                            className="lg:col-span-2 bg-[var(--surface)] rounded-3xl p-5 lg:p-7 border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col"
                         >
-                            <div className="flex items-center gap-2.5 mb-5">
+                            <div className="flex items-center gap-2.5 mb-5 flex-shrink-0">
                                 <Activity size={16} className="text-[var(--text-muted)]" />
                                 <h3 className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.12em]">Severity Distribution</h3>
                             </div>
                             {triageStatus !== 'complete' ? (
-                                <div className="flex flex-col items-center justify-center py-8 text-center">
+                                <div className="flex flex-col items-center justify-center py-8 text-center flex-1">
                                     <PieChart size={32} className="text-[var(--text-muted)] opacity-40 mb-3" />
                                     <p className="text-[14px] font-medium text-[var(--text-secondary)] mb-1">Severity distribution unavailable</p>
                                     <p className="text-[12px] text-[var(--text-muted)] mb-4">Run Quick Triage to classify breaks by severity</p>
@@ -173,7 +174,7 @@ export function OverviewView() {
                                     </button>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-8">
+                                <div className="flex flex-col sm:flex-row items-center gap-8 flex-1 justify-center">
                                     {/* SVG Ring */}
                                     <div className="relative w-[130px] h-[130px] flex-shrink-0">
                                         <svg width="130" height="130" viewBox="0 0 130 130" className="-rotate-90">
@@ -191,7 +192,7 @@ export function OverviewView() {
                                         </div>
                                     </div>
                                     {/* Legend */}
-                                    <div className="flex-1 space-y-4">
+                                    <div className="w-full sm:flex-1 space-y-4">
                                         {[
                                             { label: 'High', count: high, color: 'var(--red)', pct: Math.round(highPct) },
                                             { label: 'Medium', count: medium, color: 'var(--amber)', pct: Math.round(medPct) },
@@ -213,7 +214,7 @@ export function OverviewView() {
                         <motion.div
                             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
-                            className="col-span-3 bg-[var(--surface)] rounded-3xl p-7 border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                            className="col-span-1 lg:col-span-3 bg-[var(--surface)] rounded-3xl p-5 lg:p-7 border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                         >
                             <div className="flex items-center gap-2.5 mb-5">
                                 <BarChart3 size={16} className="text-[var(--text-muted)]" />
@@ -263,14 +264,14 @@ export function OverviewView() {
                     </div>
 
                     {/* ═══ BOTTOM ROW: Recent Breaks + Counterparties ═══ */}
-                    <div className="grid grid-cols-5 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                         {/* Recent High-Priority Breaks */}
                         <motion.div
                             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.15, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
-                            className="col-span-3 bg-[var(--surface)] rounded-3xl p-7 border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                            className="col-span-1 lg:col-span-3 bg-[var(--surface)] rounded-3xl p-5 lg:p-7 border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col"
                         >
-                            <div className="flex items-center justify-between mb-5">
+                            <div className="flex items-center justify-between mb-5 flex-shrink-0">
                                 <div className="flex items-center gap-2.5">
                                     <Zap size={16} className="text-[var(--text-muted)]" />
                                     <h3 className="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.12em]">Top Unresolved Breaks</h3>
@@ -283,40 +284,42 @@ export function OverviewView() {
                                 </button>
                             </div>
                             {topBreaks.length > 0 ? (
-                                <div className="space-y-1">
-                                    {/* Table Header */}
-                                    <div className="grid grid-cols-12 gap-3 px-3 py-2 text-[10px] uppercase tracking-[0.1em] font-bold text-[var(--text-muted)]">
-                                        <span className="col-span-1">Risk</span>
-                                        <span className="col-span-2">Ticker</span>
-                                        <span className="col-span-3">Security</span>
-                                        <span className="col-span-3">{triageStatus === 'complete' ? 'Break Type' : 'Counterparty'}</span>
-                                        <span className="col-span-3 text-right">MV Diff</span>
+                                <div className="overflow-x-auto -mx-5 px-5 lg:mx-0 lg:px-0">
+                                    <div className="min-w-[500px] space-y-1 pb-2">
+                                        {/* Table Header */}
+                                        <div className="grid grid-cols-12 gap-3 px-3 py-2 text-[10px] uppercase tracking-[0.1em] font-bold text-[var(--text-muted)]">
+                                            <span className="col-span-1">Risk</span>
+                                            <span className="col-span-2">Ticker</span>
+                                            <span className="col-span-3">Security</span>
+                                            <span className="col-span-3">{triageStatus === 'complete' ? 'Break Type' : 'Counterparty'}</span>
+                                            <span className="col-span-3 text-right">MV Diff</span>
+                                        </div>
+                                        {topBreaks.map((b, i) => (
+                                            <motion.div
+                                                key={b.id}
+                                                initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.2 + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
+                                                onClick={() => { setSelectedBreakId(b.id); setActiveView('queue'); }}
+                                                className="grid grid-cols-12 gap-3 px-3 py-3 rounded-xl hover:bg-[var(--surface-overlay)] cursor-pointer transition-colors group items-center"
+                                            >
+                                                <div className="col-span-1">
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: severityColor(b.severity) }} />
+                                                </div>
+                                                <span className="col-span-2 text-[13px] font-semibold text-[var(--text-primary)] font-tabular">{b.ticker || '—'}</span>
+                                                <span className="col-span-3 text-[12px] text-[var(--text-secondary)] truncate">{b.instrument || '—'}</span>
+                                                <span className="col-span-3 text-[12px] text-[var(--text-muted)]">{triageStatus === 'complete' ? (b.breakType || '—') : (b.counterparty || '—')}</span>
+                                                <div className="col-span-3 flex items-center justify-end gap-2">
+                                                    <span className="text-[13px] font-semibold font-tabular" style={{ color: severityColor(b.severity) }}>
+                                                        ${Math.abs(b.mvDiff || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    </span>
+                                                    <ChevronRight size={14} className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </div>
+                                            </motion.div>
+                                        ))}
                                     </div>
-                                    {topBreaks.map((b, i) => (
-                                        <motion.div
-                                            key={b.id}
-                                            initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.2 + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
-                                            onClick={() => { setSelectedBreakId(b.id); setActiveView('queue'); }}
-                                            className="grid grid-cols-12 gap-3 px-3 py-3 rounded-xl hover:bg-[var(--surface-overlay)] cursor-pointer transition-colors group items-center"
-                                        >
-                                            <div className="col-span-1">
-                                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: severityColor(b.severity) }} />
-                                            </div>
-                                            <span className="col-span-2 text-[13px] font-semibold text-[var(--text-primary)] font-tabular">{b.ticker || '—'}</span>
-                                            <span className="col-span-3 text-[12px] text-[var(--text-secondary)] truncate">{b.instrument || '—'}</span>
-                                            <span className="col-span-3 text-[12px] text-[var(--text-muted)]">{triageStatus === 'complete' ? (b.breakType || '—') : (b.counterparty || '—')}</span>
-                                            <div className="col-span-3 flex items-center justify-end gap-2">
-                                                <span className="text-[13px] font-semibold font-tabular" style={{ color: severityColor(b.severity) }}>
-                                                    ${Math.abs(b.mvDiff || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                </span>
-                                                <ChevronRight size={14} className="text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            </div>
-                                        </motion.div>
-                                    ))}
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)]">
+                                <div className="flex flex-col items-center justify-center py-12 text-[var(--text-muted)] flex-1">
                                     <Shield size={32} className="opacity-20 mb-3" />
                                     <p className="text-[13px] font-medium">All breaks resolved</p>
                                 </div>
@@ -327,7 +330,7 @@ export function OverviewView() {
                         <motion.div
                             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2, ease: [0.16, 1, 0.3, 1], duration: 0.5 }}
-                            className="col-span-2 bg-[var(--surface)] rounded-3xl p-7 border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col"
+                            className="col-span-1 lg:col-span-2 bg-[var(--surface)] rounded-3xl p-5 lg:p-7 border border-[var(--border-subtle)] shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col"
                         >
                             {/* Break Aging */}
                             <div className="mb-6">

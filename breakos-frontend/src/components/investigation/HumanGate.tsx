@@ -293,7 +293,7 @@ Brokerage Operations — Reconciliations`;
                     {decisionType === 'escalate' ? (
                         <div className="space-y-4">
                             {/* Operational Fields Grid */}
-                            <div className="flex gap-3">
+                            <div className="flex flex-col sm:flex-row gap-3">
                                 <div className="flex-1">
                                     <span className="text-[11px] uppercase font-bold text-[var(--text-muted)] tracking-wider block mb-1.5 flex items-center justify-between">
                                         Route To
@@ -323,7 +323,7 @@ Brokerage Operations — Reconciliations`;
                                         <option value="Urgent">Urgent</option>
                                     </select>
                                 </div>
-                                <div className="flex-[0.8]">
+                                <div className="flex-[0.8] sm:flex-[0.8]">
                                     <span className="text-[11px] uppercase font-bold text-[var(--text-muted)] tracking-wider block mb-1.5 flex items-center justify-between">
                                         Ticket ID <span className="text-[9px] opacity-60 font-normal normal-case">(Opt)</span>
                                     </span>
@@ -337,7 +337,7 @@ Brokerage Operations — Reconciliations`;
                                 </div>
                             </div>
 
-                            <div className="flex gap-4">
+                            <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-1">
                                     <span className="text-[12px] uppercase font-bold text-[var(--text-muted)] tracking-widest block mb-2">Verification</span>
                                     <div className="space-y-2 mt-2">
@@ -358,7 +358,7 @@ Brokerage Operations — Reconciliations`;
                                 </div>
 
                                 <div className="flex-[1.5]">
-                                    <span className="text-[12px] uppercase font-bold text-[var(--text-muted)] tracking-widest block mb-1.5 flex justify-between items-center">
+                                    <span className="text-[12px] uppercase font-bold text-[var(--text-muted)] tracking-widest block mb-1.5 flex justify-between items-center mt-4 sm:mt-0">
                                         Analyst Comments <span className="text-[var(--red)]">*</span>
                                     </span>
                                     <textarea

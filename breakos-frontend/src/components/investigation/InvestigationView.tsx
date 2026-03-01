@@ -223,22 +223,22 @@ export function InvestigationView({ breakId }: { breakId: string }) {
                             className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col"
                         >
                             {section.title && (
-                                <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center gap-2.5 bg-[var(--bg)]">
+                                <div className="px-5 lg:px-6 py-4 border-b border-[var(--border-subtle)] flex items-center gap-2.5 bg-[var(--bg)]">
                                     <SectionIcon type={section.type} />
-                                    <h4 className="text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-widest">{section.title}</h4>
+                                    <h4 className="text-[11px] lg:text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-widest">{section.title}</h4>
                                 </div>
                             )}
-                            <div className="px-6 py-5">
+                            <div className="px-5 lg:px-6 py-4 lg:py-5">
                                 {section.items.map((item, j) => (
                                     <div key={j} className="mb-4 last:mb-0">
                                         {item.type === 'heading' && (
-                                            <h5 className="text-[14px] font-semibold text-[var(--text-primary)] mb-2 flex items-center gap-2 tracking-tight">
+                                            <h5 className="text-[13px] lg:text-[14px] font-semibold text-[var(--text-primary)] mb-2 flex items-center gap-2 tracking-tight">
                                                 <ChevronRight size={14} className="text-[var(--accent)]" />
                                                 {item.content}
                                             </h5>
                                         )}
                                         {item.type === 'text' && (
-                                            <p className="text-[14px] text-[var(--text-secondary)] leading-[1.8] pl-6 font-medium">{item.content}</p>
+                                            <p className="text-[13px] lg:text-[14px] text-[var(--text-secondary)] leading-[1.8] pl-2 lg:pl-6 font-medium">{item.content}</p>
                                         )}
                                         {item.type === 'metric' && (
                                             (item.label && (
@@ -249,10 +249,10 @@ export function InvestigationView({ breakId }: { breakId: string }) {
                                             )) ? (
                                                 <ConfidenceBar label={item.label || ''} content={item.content} index={j} />
                                             ) : (
-                                                <div className="flex items-center gap-3 pl-6 py-1.5">
-                                                    <span className="text-[13px] text-[var(--text-muted)] font-medium tracking-wide">{item.label}:</span>
+                                                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 pl-2 lg:pl-6 py-1.5">
+                                                    <span className="text-[12px] lg:text-[13px] text-[var(--text-muted)] font-medium tracking-wide">{item.label}:</span>
                                                     <span className={cn(
-                                                        "text-[14px] font-semibold font-mono tracking-tight",
+                                                        "text-[13px] lg:text-[14px] font-semibold font-mono tracking-tight",
                                                         item.highlight === 'red' ? 'text-[var(--red)]' :
                                                             item.highlight === 'green' ? 'text-[var(--green)]' :
                                                                 item.highlight === 'amber' ? 'text-[var(--amber)]' :
@@ -279,15 +279,15 @@ export function InvestigationView({ breakId }: { breakId: string }) {
                                 transition={{ delay: 0.3 }}
                                 className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                             >
-                                <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center gap-2.5 bg-[var(--bg)]">
+                                <div className="px-5 lg:px-6 py-4 border-b border-[var(--border-subtle)] flex items-center gap-2.5 bg-[var(--bg)]">
                                     <Sparkles size={14} className="text-[var(--accent)]" />
-                                    <h4 className="text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-widest">AI Investigation Summary</h4>
-                                    <div className="ml-auto flex items-center gap-1.5">
+                                    <h4 className="text-[11px] lg:text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-widest truncate">AI Investigation Summary</h4>
+                                    <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
                                         <CheckCircle size={12} className="text-[var(--green)]" />
-                                        <span className="text-[11px] font-semibold text-[var(--green)]">Complete</span>
+                                        <span className="text-[11px] font-semibold text-[var(--green)] hidden sm:inline">Complete</span>
                                     </div>
                                 </div>
-                                <div className="px-6 py-5 space-y-4">
+                                <div className="px-5 lg:px-6 py-4 lg:py-5 space-y-4">
                                     {/* Findings */}
                                     {findings.length > 0 && (
                                         <ul className="space-y-3">
@@ -326,9 +326,9 @@ export function InvestigationView({ breakId }: { breakId: string }) {
                     {sections.length === 0 && (
                         <motion.div
                             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                            className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                            className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-3xl p-5 lg:p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                         >
-                            <div className="text-[14px] leading-[1.8] whitespace-pre-wrap text-[var(--text-secondary)] font-medium">
+                            <div className="text-[13px] lg:text-[14px] leading-[1.8] whitespace-pre-wrap text-[var(--text-secondary)] font-medium">
                                 {text}
                             </div>
                         </motion.div>
@@ -338,7 +338,9 @@ export function InvestigationView({ breakId }: { breakId: string }) {
 
             {/* Pattern Intelligence (Specific to this break) */}
             {status === 'complete' && (
-                <PatternIntelligenceCard forBreakId={breakId} />
+                <div className="mt-4">
+                    <PatternIntelligenceCard forBreakId={breakId} />
+                </div>
             )}
         </div>
     );
@@ -356,12 +358,12 @@ function ConfidenceBar({ label, content, index }: { label: string, content: stri
     else if (lowerLabel.includes('secondary')) fillClass = "bg-[var(--amber)]";
 
     return (
-        <div className="mb-5 pl-6 pr-6">
-            <div className="flex justify-between items-end mb-2">
-                <span className="text-[14px] text-[var(--text-primary)] tracking-tight">
+        <div className="mb-5 pl-2 pr-2 lg:pl-6 lg:pr-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-end mb-2 gap-1 sm:gap-0">
+                <span className="text-[13px] lg:text-[14px] text-[var(--text-primary)] tracking-tight">
                     <span className="font-semibold text-[var(--text-secondary)] mr-1">{label}:</span> <span className="font-medium">{text}</span>
                 </span>
-                {pctMatch && <span className="text-[14px] font-bold text-[var(--accent)] font-mono">{pct}%</span>}
+                {pctMatch && <span className="text-[13px] lg:text-[14px] font-bold text-[var(--accent)] font-mono">{pct}%</span>}
             </div>
             {pctMatch && (
                 <div className="h-[8px] rounded-full bg-[var(--surface-overlay)] overflow-hidden shadow-inner">

@@ -4,9 +4,11 @@ import { DetailPanel } from '../investigation/DetailPanel';
 import { InvestigationView } from '../investigation/InvestigationView';
 import { HumanGate } from '../investigation/HumanGate';
 import { useEffect, useRef } from 'react';
+import { ChevronLeft } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 export function InvestigationPage() {
-    const { selectedBreakId, investigationStatus } = useStore();
+    const { selectedBreakId, setSelectedBreakId, investigationStatus } = useStore();
     const status = selectedBreakId ? (investigationStatus[selectedBreakId] || 'idle') : 'idle';
     const investigationActive = status !== 'idle';
     const investigationComplete = status === 'complete';
@@ -22,12 +24,31 @@ export function InvestigationPage() {
     }, [status]);
 
     return (
-        <div className="flex h-full overflow-hidden">
+        <div className="flex flex-col lg:flex-row h-full overflow-hidden relative">
             {/* Left: Break queue for selection */}
-            <BreakQueue />
+            <div className={cn(
+                "h-full lg:block transition-all duration-300",
+                selectedBreakId ? "hidden lg:block w-0 lg:w-auto" : "w-full lg:w-auto block"
+            )}>
+                <BreakQueue />
+            </div>
 
             {/* Right: Detail + Investigation */}
-            <div className="flex-1 h-full overflow-y-auto p-4 pb-6 space-y-3">
+            <div className={cn(
+                "h-full overflow-y-auto p-4 lg:p-4 pb-6 space-y-3 flex-1 transition-all duration-300",
+                !selectedBreakId ? "hidden lg:block" : "block w-full"
+            )}>
+                {/* Mobile Back Button */}
+                {selectedBreakId && (
+                    <button
+                        onClick={() => setSelectedBreakId(null)}
+                        className="lg:hidden flex items-center gap-1.5 text-[13px] font-medium text-[var(--text-secondary)] mb-2 hover:text-[var(--text-primary)] transition-colors"
+                    >
+                        <ChevronLeft size={16} />
+                        Back to Queue
+                    </button>
+                )}
+
                 <DetailPanel />
 
                 {selectedBreakId && investigationActive && (
