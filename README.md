@@ -5,7 +5,7 @@ An AI-native operations tool that automates the manual investigation of trade re
 ---
 
 ## The Problem
-In middle and back-office operations, reconciling thousands of trades daily across depositories (like CDS, DTC) and third-party fund administrators generates hundreds of "breaks" (mismatches). While identifying breaks is automated, **investigating them is highly manual**. A complex reconciliation break can take an analyst 45 to 90 minutes to investigate by cross-referencing vendor data, checking corporate actions, calculating accruals, and drafting emails. 
+In middle and back-office operations, reconciling thousands of trades daily across depositories (like CDS, DTC) and third-party administrators generates hundreds of "breaks" (mismatches). While identifying breaks is automated, **investigating them is highly manual**. A complex reconciliation break can take an analyst 45 to 90 minutes to investigate by cross-referencing vendor data, checking corporate actions, calculating accruals, and drafting emails. 
 
 BreakOS doesn't replace the recon process — it replaces the grueling investigation that happens *after* breaks are found.
 
