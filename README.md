@@ -1,79 +1,171 @@
-# BreakOS — AI-Native Reconciliation Break Investigator
+<div align="center">
 
-An AI-native operations tool that automates the manual investigation of trade reconciliation breaks.
+<h1>BreakOS</h1>
+
+<img src="https://readme-typing-svg.demolab.com?font=Geist+Mono&size=18&duration=3000&pause=1200&color=6E9EF7&center=true&vCenter=true&width=560&lines=AI+investigates+your+breaks.;Human+judgment+makes+the+call.;Triage+a+morning+queue+in+minutes%2C+not+hours." alt="Typing SVG" />
+
+<br/>
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-breakos.vercel.app-6E9EF7?style=for-the-badge&logo=vercel&logoColor=white)](https://breakos.vercel.app)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Python-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Claude](https://img.shields.io/badge/Claude-3.5%20Sonnet-CC785C?style=for-the-badge&logo=anthropic&logoColor=white)](https://anthropic.com)
+
+</div>
 
 ---
 
 ## The Problem
-In middle and back-office operations, reconciling thousands of trades daily across depositories (like CDS, DTC) and third-party administrators generates hundreds of "breaks" (mismatches). While identifying breaks is automated, **investigating them is highly manual**. A complex reconciliation break can take an analyst 45 to 90 minutes to investigate by cross-referencing vendor data, checking corporate actions, calculating accruals, and drafting emails. 
 
-BreakOS doesn't replace the recon process — it replaces the grueling investigation that happens *after* breaks are found.
+In middle and back-office operations, reconciling thousands of trades daily across depositories (DTC, CDS) and third-party fund administrators generates hundreds of **breaks** — mismatches between your books and the street. Identifying them is automated. **Investigating them isn't.**
 
-## How it Works
-**The analyst does their recon exactly as they do today.** When breaks are identified, they upload the break report to BreakOS. 
+A single complex break can take an analyst 45–90 minutes to investigate: cross-referencing vendor data, checking corporate actions, computing accruals, drafting emails, routing to the right desk. Multiply that across a morning queue of 30, 50, or 100 breaks.
 
-The AI investigates each break automatically:
-1. **Live Data Enrichment**: Fetches live market data, corporate action history, and computes relevant metrics.
-2. **AI Classification**: Classifies break type and determines the likely root cause.
-3. **Hypothesis Generation**: Creates confidence-scored explanations with explicit reasoning.
-4. **Draft Comms**: Drafts communications to counterparties and internal teams.
-5. **Smart Routing**: Recommends escalation routing (Settlements, Corp Actions, Trade Desk, etc.).
-
-### The Human Gate
-BreakOS embraces the critical nature of operational risk. **The AI cannot and should not approve its own escalation recommendations.** A material break affecting client positions requires documented human accountability under regulatory rules. The analyst reviews the AI's full reasoning, makes the call (approve or override), and the decision is permanently logged for audit.
-
-The cognitive load of investigation is offloaded — the analyst's job becomes judgment and accountability, not research. A morning break queue that took hours can be triaged and investigated in minutes.
+> BreakOS doesn't replace your recon process. It replaces the grueling investigation that happens *after* breaks are found.
 
 ---
 
-## Setup & Running Locally
+## How It Works
 
-BreakOS consists of a Python FastAPI backend and a React/Vite frontend.
+The analyst does their recon exactly as they do today. When breaks surface, they upload the report to BreakOS. From there:
 
-### 1. Backend Setup
+```
+ Upload Break Report
+         │
+         ▼
+ ┌───────────────────┐
+ │   Quick Triage    │  ← AI classifies all breaks by type & severity in ~10s
+ │  (Batch Claude)   │
+ └────────┬──────────┘
+          │
+          ▼
+ ┌───────────────────┐    Live Market Data (Yahoo Finance)
+ │  AI Investigation │ ←  Corporate Actions & EDGAR Filings
+ │  (Streaming LLM)  │    Bond Accruals (rateslib)
+ └────────┬──────────┘    Settlement Rules (DTC / CDS)
+          │
+          ▼
+ ┌───────────────────┐
+ │   Human Gate  🔒  │  ← Analyst reviews full reasoning, approves or overrides
+ │  (Audit Logged)   │
+ └───────────────────┘
+          │
+          ▼
+ Escalation routed to the right desk. Decision permanently logged.
+```
+
+### The Human Gate
+
+BreakOS is built around the principle that **the AI cannot approve its own escalation recommendations.** A material break affecting client positions requires documented human accountability under regulatory rules. The analyst reviews the AI's complete reasoning chain, makes the judgment call (approve or override), and the decision is immutably logged for audit.
+
+The cognitive load of investigation is offloaded. The analyst's job becomes **judgment and accountability** — not research.
+
+---
+
+## Features
+
+| Feature | Description |
+|---|---|
+| **Break Queue** | Filterable, sortable list of all breaks with severity indicators and MV exposure |
+| **Quick Triage** | One-click batch AI classification of all breaks by type and severity |
+| **AI Investigation** | Streaming deep-dive: live data enrichment → root cause classification → confidence-scored hypotheses → draft comms |
+| **Human Gate** | Review panel where analysts approve or override AI recommendations — with full audit trail |
+| **Overview Dashboard** | MV exposure, severity ring chart, break type analysis, aging buckets, and investigation progress |
+| **Audit Log** | Immutable record of every decision, timestamp, analyst note, and routing action |
+| **Dark / Light Mode** | Full theme support |
+| **File Upload or Sample Data** | Accepts `.xlsx` / `.csv` break reports, or generate realistic synthetic data instantly |
+
+---
+
+## Demo
+
+**→ [breakos.vercel.app](https://breakos.vercel.app)**
+
+1. Click **"Generate Sample Data"** to load a realistic set of randomized breaks across pricing, quantity, timing, corp action, and accrual types
+2. Click **"Run Quick Triage"** to batch-classify all breaks by severity and type
+3. Select any break from the queue to launch a full AI investigation
+4. Review the AI's reasoning in the Human Gate and approve or override
+
+> **Note:** The live demo requires a backend connection for AI investigation. The overview dashboard and triage features work immediately with sample data.
+
+---
+
+## Data Sources
+
+| Source | What It Provides | How BreakOS Uses It |
+|--------|-----------------|---------------------|
+| **Yahoo Finance (`yfinance`)** | Live prices, historical closes, volumes | Calculates precise dollar-value differences on pricing breaks; identifies stale vendor prices |
+| **Corporate Actions (Yahoo)** | Ex-dates, dividends, stock splits | Detects if a quantity or MV break is actually an unbooked dividend or pending split |
+| **SEC EDGAR** | 8-K filings, merger announcements | Provides deterministic proof for complex corp actions causing security mismatches |
+| **`rateslib`** | Fixed income analytics | Computes Act/360 and 30/360 accrued interest for bond breaks |
+| **Settlement Rules** | CDS (Canada) & DTC (US) cycles | Flags T+1 timing differences — breaks that aren't really breaks yet |
+| **Counterparty Intelligence** | Simulated custodian behavior | Models typical patterns (RBC IS late sweeps, State Street batch delays) for AI confidence scoring |
+
+---
+
+## Tech Stack
+
+**Frontend**
+- React 19 + TypeScript
+- Tailwind CSS
+- Framer Motion
+- Zustand
+- Vite
+
+**Backend**
+- FastAPI (Python)
+- Anthropic Claude 3.5 Sonnet
+- `yfinance`, `rateslib`, `pandas`
+
+---
+
+## Running Locally
+
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- An `ANTHROPIC_API_KEY`
+
+### 1. Backend
+
 ```bash
+# Clone and navigate
+git clone https://github.com/your-username/breakos.git
+cd breakos
+
+# Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
 # Install dependencies
 pip install -r requirements.txt
+
+# Set your API key
+export ANTHROPIC_API_KEY=sk-ant-...
 
 # Start the FastAPI server
 uvicorn server:app --reload --port 8000
 ```
 
-### 2. Frontend Setup
+### 2. Frontend
+
 ```bash
 cd breakos-frontend
 
-# Install dependencies
 npm install
-
-# Start the Vite dev server
 npm run dev
 ```
 
-### 3. Usage
-- Make sure you have your `ANTHROPIC_API_KEY` set in your environment variables.
-- Open the frontend app (usually `http://localhost:5173`).
-- Click "Generate Sample Data" to load randomized, realistic breaks.
-- Click "Run Quick Triage" to simulate the automated morning classification.
+Open [http://localhost:5173](http://localhost:5173).
+
+### 3. Quick Start
+
+- Click **"Generate Sample Data"** to load randomized, realistic breaks
+- Click **"Run Quick Triage"** to classify the queue
+- Select a break and click **"Investigate"** to run the full AI analysis
 
 ---
 
-## Data Sources & Integrations
-BreakOS is built to interpret the same data a human analyst would use. It integrates with real-world financial data APIs to contextualize and resolve breaks:
+## Built by
 
-| Data Source | What It Provides | How BreakOS Uses It |
-|-------------|------------------|----------------------|
-| **Yahoo Finance (`yfinance`)** | Live market prices, historical close prices, trade volumes | To calculate precise Dollar Value (MV) differences on pricing breaks and identify if a stale vendor price is the root cause. |
-| **Corporate Actions (via Yahoo)** | Ex-dates, dividends, stock splits | To automatically detect if a quantity or MV break is actually an unbooked dividend or a pending stock split. |
-| **SEC EDGAR Filings** | 8-K statements, merger announcements | To provide deterministic proof for complex corporate actions (e.g., acquisitions, ticker changes) that cause security mismatches. |
-| **`rateslib`** | Fixed income analytics & accrued interest | To calculate precise Act/360 or 30/360 interest accruals for bond breaks. |
-| **Depository Settlement Rules** | CDS (Canada) & DTC (US) logic | Hardcoded logic to simulate T+1 settlement cycles and flag when a "break" is actually just a trade that hasn't settled yet based on the trade date. |
-| **Counterparty Intelligence** | Simulated participant data | Mimics typical behavior patterns of major custodians (e.g., RBC IS missing late-day sweeps, State Street batch delays) to inform AI confidence scores. |
-
----
-
-## Technology Stack
-- **Frontend**: React, TypeScript, Tailwind CSS, Framer Motion, Zustand
-- **Backend**: FastAPI, Python
-- **AI/LLM**: Anthropic Claude 3.5 Sonnet
-- **Data Integrations**: Yahoo Finance (`yfinance`) for market data, `rateslib` for fixed income accruals
+[Akshat Aneja](https://github.com/akshat-aneja)
