@@ -86,7 +86,6 @@ The cognitive load of investigation is offloaded. The analyst's job becomes **ju
 3. Select any break from the queue to launch a full AI investigation
 4. Review the AI's reasoning in the Human Gate and approve or override
 
-> **Note:** The live demo requires a backend connection for AI investigation. The overview dashboard and triage features work immediately with sample data.
 
 ---
 
@@ -165,7 +164,3 @@ Open [http://localhost:5173](http://localhost:5173).
 - Select a break and click **"Investigate"** to run the full AI analysis
 
 ---
-
-## Built by
-
-[Akshat Aneja](https://github.com/akshat-aneja)
