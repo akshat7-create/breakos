@@ -14,6 +14,7 @@
 </div>
 
 ---
+## Note: Please check SUBMISSION.MD file for more details regarding Short written explanation, AI experience and Salary Expectations
 
 ## The Problem
 
