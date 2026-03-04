@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { AppLayout } from './components/layout/AppLayout';
 import { OverviewView } from './components/views/OverviewView';
 import { AuditLogView } from './components/views/AuditLogView';
@@ -55,8 +56,11 @@ export default function App() {
     };
 
     return (
-        <AppLayout>
-            {renderView()}
-        </AppLayout>
+        <>
+            <AppLayout>
+                {renderView()}
+            </AppLayout>
+            <Analytics />
+        </>
     );
 }
